@@ -1,4 +1,4 @@
-# Création du terminal LaBoutik à partir d'un script bash
+# Creating a LaBoutik terminal from a bash script
 ## Quick Start
 Create a  PI OS Legacy 32 bit Lite  via Raspberry Pi Imager
 - put user " sysop" ( not an another)
