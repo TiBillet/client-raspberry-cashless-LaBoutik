@@ -1,9 +1,11 @@
 # Creating a LaBoutik terminal from a bash script
 ## Quick Start
 Create a  PI OS Legacy 32 bit Lite  via Raspberry Pi Imager
+
+On Raspberry Pi Imager :
 - put user " sysop" ( not an another)
 - put your wifi config
-- Put your ssh key
+- Put your ssh key ( yes we can with new version :) )
 
 Boot your Pi
 
@@ -21,6 +23,7 @@ sudo ./LaBoutik.sh password token protocole serveur rotate nfc
 - server : server address (without //http*)
 - rotate : 0 -> Normal , 1 -> 90°, 2 -> 180°, 3 -> 270°
 - nfc : if usb reader : usb , if GPIO reader : gpio
+
 And take a coffe :)
 
 ## Details of operations :
