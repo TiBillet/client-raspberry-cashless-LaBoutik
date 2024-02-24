@@ -37,7 +37,7 @@ git clone --branch Mike-sh --single-branch https://github.com/samijuju/installRa
 
 # copie de tous les fichiers ds /home/sysop
 cp -r /home/sysop/installRaspberry/* /home/sysop/ >> installation.log 2>&1
-cd /home/sysop >> installation.log 2>&1
+#cd /home/sysop >> installation.log 2>&1
 
 
 
