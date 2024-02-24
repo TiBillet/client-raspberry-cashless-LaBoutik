@@ -36,7 +36,7 @@ echo "----- clonage du depot"
 git clone --branch Mike-sh --single-branch https://github.com/samijuju/installRaspberry.git >> installation.log 2>&1
 
 # copie de tous les fichiers ds /home/sysop
-cp /home/sysop/installRaspberry/* /home/sysop/ >> installation.log 2>&1
+cp -r /home/sysop/installRaspberry/* /home/sysop/ >> installation.log 2>&1
 cd /home/sysop >> installation.log 2>&1
 
 
