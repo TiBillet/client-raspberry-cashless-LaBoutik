@@ -196,23 +196,23 @@ cd /home/sysop/
 #else
 #    7z x /home/sysop/serveurNfc.7z -o/home/sysop/
 #fi
- chmod -R 774 serveurNfcNodeJsVma405
- chown -R root:sysop  serveurNfcNodeJsVma405
+ chmod -R 774 serveurNfcNodeJs
+ chown -R root:sysop  serveurNfcNodeJs
 # echo "-----------------------1"
 
 echo "----- Installer les modules node js pour serveurNfc"
 #Installer les modules node js pour serveurNfc
-cd /home/sysop/serveurNfcNodeJsVma405
+cd /home/sysop/serveurNfcNodeJs
 npm install >> installation.log 2>&1
 
 echo "----- Maj .chromium_env"
 #Maj .chromium_env
 echo "Maj .chromium_env"
-sed -i "/^hostname = */c hostname = $hostname" /home/sysop/serveurNfcNodeJsVma405/.chromium_env
-sed -i "/^front_type = */c front_type = $frontType" /home/sysop/serveurNfcNodeJsVma405/.chromium_env
-sed -i "/^password = */c password = $password" /home/sysop/serveurNfcNodeJsVma405/.chromium_env
-sed -i "/^token = */c token = $token" /home/sysop/serveurNfcNodeJsVma405/.chromium_env
-sed -i "/^url = */c url = $protocole://$serveur/wv/login_hardware" /home/sysop/serveurNfcNodeJsVma405/.chromium_env
+sed -i "/^hostname = */c hostname = $hostname" /home/sysop/serveurNfcNodeJs/.chromium_env
+sed -i "/^front_type = */c front_type = $frontType" /home/sysop/serveurNfcNodeJs/.chromium_env
+sed -i "/^password = */c password = $password" /home/sysop/serveurNfcNodeJs/.chromium_env
+sed -i "/^token = */c token = $token" /home/sysop/serveurNfcNodeJs/.chromium_env
+sed -i "/^url = */c url = $protocole://$serveur/wv/login_hardware" /home/sysop/serveurNfcNodeJs/.chromium_env
 
 #Autologin mode console
 raspi-config nonint do_boot_behaviour B2
