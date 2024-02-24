@@ -11,9 +11,11 @@ Boot your Pi
 
 Connect it via ssh
 
-Copy LaBoutik.sh to your pi
+Copy LaBoutik.sh to your pi with curl : Don't use git clone .
 
 ```
+curl -O https://github.com/TiBillet/client-raspberry-cashless-LaBoutik/blob/main/LaBoutik.sh
+
 chmod +x LaBoutik.sh
 
 sudo ./LaBoutik.sh password token protocole serveur rotate nfc
