@@ -1,7 +1,7 @@
 #!/bin/bash
 set -e
 # usage : ./LaBoutik.sh password token protocole serveur rotate nfc
-# sudo ./LaBoutik.sh toto "$a;b2yuM5454@4cd" https chipek.cashless.tibillet.re 3 gpio
+# sudo ./LaBoutik.sh toto "$a;b2yuM5454@4cd" https VotreDomaine.cashless.tibillet.re 3 gpio
 
 
 hostname=$(hostname)
@@ -30,17 +30,12 @@ apt-get install git -y >> installation.log 2>&1
 
 #Git Clone
 echo "----- clonage du depot"
-###fonctionne pas car le fichier .sh est dans le repertoire ce dernier n'est donc pas vide
-#git clone --branch Mike-sh --single-branch https://github.com/samijuju/installRaspberry.git . 
-#
+
 git clone --branch Mike-sh --single-branch https://github.com/samijuju/installRaspberry.git >> installation.log 2>&1
 
 # copie de tous les fichiers ds /home/sysop
 cp -r /home/sysop/installRaspberry/* /home/sysop/ >> installation.log 2>&1
 #cd /home/sysop >> installation.log 2>&1
-
-
-
 
 echo "----- install 7Zip"
 apt-get install p7zip-full -y >> installation.log 2>&1
@@ -71,12 +66,6 @@ else
     echo '[[ -z $DISPLAY && $XDG_VTNR -eq 1 ]] && startx -- -nocursor' >> /home/sysop/.bashrc
 fi
 
-###### deja present ds Git
-#Copie du fichier autostart
-# echo "----- Copie du fichier autostart"
-# rsync -a --backup --suffix=.bak ./autostart /home/sysop/autostart
-##### fin deja present ds Git
-
 # changement des droits
 chown sysop:sysop /home/sysop/autostart 
 chmod 0770 /home/sysop/autostart 
@@ -92,8 +81,6 @@ if [ ! -d /home/sysop/LCD-show ] ; then
     git clone https://github.com/goodtft/LCD-show.git >> installation.log 
     chown -R sysop:sysop /home/sysop/LCD-show >> installation.log 
     chmod 0775 /home/sysop/LCD-show >> installation.log 
-    
-    
     sed -i "s|^sudo reboot$|# remove sudo reboot|" "/home/sysop/LCD-show/LCD7C-show" 
     sed -i "s|^echo \"reboot now\"$|# remove reboot now|" "/home/sysop/LCD-show/LCD7C-show" 
     chmod +x /home/sysop/LCD-show/LCD7C-show 
@@ -129,14 +116,7 @@ apt-get install pcsc-tools -y >> installation.log 2>&1
 echo "----- cas lecteur NFC USB"
 ###cas lecteur NFC USB
 if echo "$nfc" | grep -i "usb"; then
-    echo "install libpcsclite1"
-    apt-get install libpcsclite1 -y >> installation.log 2>&1
-    echo "install libpcsclite-dev"
-    apt-get install libpcsclite-dev -y >> installation.log 2>&1
-    echo "install pcscd"
-    apt-get install pcscd -y >> installation.log 2>&1
-    echo "install pcsc-tools"
-    apt-get install pcsc-tools -y >> installation.log 2>&1
+    
     #Copie du fichier blacklist.conf (ne pas déscativer ses modules)
     rsync -a --backup --suffix=.bak ./blacklist.conf /etc/modprobe.d/blacklist.conf
     chown sysop:sysop /etc/modprobe.d/blacklist.conf
@@ -154,7 +134,6 @@ elif echo "$nfc" | grep -i "gpio"; then
 ### fin GPIO
 fi
 
-
 apt-get install -y ca-certificates curl gnupg -y
 curl -fsSL https://deb.nodesource.com/gpgkey/nodesource-repo.gpg.key | sudo gpg --dearmor -o /usr/share/keyrings/nodesource.gpg
 #NODE_MAJOR=18
@@ -163,8 +142,6 @@ echo "deb [signed-by=/usr/share/keyrings/nodesource.gpg] https://deb.nodesource.
 #Maj des paquets
 apt-get update -y
 apt-get install nodejs -y
-
-
 
 echo "----- install gcc"
 apt-get install gcc -y >> installation.log 2>&1
@@ -176,37 +153,8 @@ echo "----- install apt-transport-https"
 apt-get install apt-transport-https -y >> installation.log 2>&1
 
 cd /home/sysop/
-######@@ Le fichier .7z existe deja car present ds le GIT##########
-# echo "1-----------------------"
-# echo "----- Copie du fichier serveurNfc.7z"
-# #Copie du fichier serveurNfc.7z
-
-# # Vérifier si le fichier existe
-# if [ -e /home/sysop/installRaspberry/serveurNfc.7z ]; then
-#     # Écraser le fichier
-#     echo "Écrasement du fichier..."
-#     rm /home/sysop/serveurNfc.7z
-#     rsync -a --backup --suffix=.bak ./serveurNfc.7z /home/sysop/serveurNfc.7z
-# else
-#     rsync -a --backup --suffix=.bak ./serveurNfc.7z /home/sysop/serveurNfc.7z
-    
-# fi
-######@@ fin -Le fichier .7z existe deja car present ds le GIT##########
-
-#chown sysop:sysop /home/sysop/serveurNfc.7z
-
-#echo "----- décompresser le fichier serveurNfc.7z"
-#décompresser le fichier serveurNfc.7z
-#if [ -d /home/sysop/serveurNfcNodeJsVma405 ]; then
-    # Le répertoire existe
-#    echo "Effacement du repertoire"
-#    rm -r /home/sysop/serveurNfcNodeJsVma405
-#    7z x /home/sysop/serveurNfc.7z -o/home/sysop/
-#else
-#    7z x /home/sysop/serveurNfc.7z -o/home/sysop/
-#fi
- chmod -R 774 serveurNfcNodeJs
- chown -R root:sysop  serveurNfcNodeJs
+chmod -R 774 serveurNfcNodeJs
+chown -R root:sysop  serveurNfcNodeJs
 # echo "-----------------------1"
 
 echo "----- Installer les modules node js pour serveurNfc"
@@ -233,12 +181,6 @@ apt-get install rpd-plym-splash -y >> installation.log 2>&1
 #Installation de "fbi", pour visualiser le splash screen(logo)
 echo "----- Installation de fbi, pour visualiser le splash screen(logo)"
 apt-get install fbi -y >> installation.log 2>&1
-
-#####deja present ds git
-#Copie du fichier image splash.png
-# echo "Copie du fichier image splash.png"
-# rsync -a --backup --suffix=.bak ./splash.png /home/sysop/installRaspberry/splash.png
-######
 
 #Suppression du logo raspberry pi, modification du fichier /boot/cmdline.txt
 echo "----- Suppression du logo raspberry pi, modification du fichier /boot/cmdline.txt"
