@@ -145,12 +145,18 @@ elif echo "$nfc" | grep -i "gpio"; then
 ### fin GPIO
 fi
 
-echo "----- Ajout du dépot nodes js"
-#Ajout du dépot nodes js
-curl -sL https://deb.nodesource.com/setup_16.x | sudo -E bash -
 
-echo "----- install nodejs"
-apt-get install nodejs -y >> installation.log 2>&1
+apt-get install -y ca-certificates curl gnupg -y
+curl -fsSL https://deb.nodesource.com/gpgkey/nodesource-repo.gpg.key | sudo gpg --dearmor -o /usr/share/keyrings/nodesource.gpg
+#NODE_MAJOR=18
+NODE_MAJOR=20
+echo "deb [signed-by=/usr/share/keyrings/nodesource.gpg] https://deb.nodesource.com/node_$NODE_MAJOR.x nodistro main" | sudo tee /etc/apt/sources.list.d/nodesource.list
+#Maj des paquets
+apt-get update -y
+apt-get install nodejs -y
+
+
+
 echo "----- install gcc"
 apt-get install gcc -y >> installation.log 2>&1
 echo "----- install g++"
@@ -178,18 +184,18 @@ cd /home/sysop/
 # fi
 ######@@ fin -Le fichier .7z existe deja car present ds le GIT##########
 
-chown sysop:sysop /home/sysop/serveurNfc.7z
+#chown sysop:sysop /home/sysop/serveurNfc.7z
 
-echo "----- décompresser le fichier serveurNfc.7z"
+#echo "----- décompresser le fichier serveurNfc.7z"
 #décompresser le fichier serveurNfc.7z
-if [ -d /home/sysop/serveurNfcNodeJsVma405 ]; then
+#if [ -d /home/sysop/serveurNfcNodeJsVma405 ]; then
     # Le répertoire existe
-    echo "Effacement du repertoire"
-    rm -r /home/sysop/serveurNfcNodeJsVma405
-    7z x /home/sysop/serveurNfc.7z -o/home/sysop/
-else
-    7z x /home/sysop/serveurNfc.7z -o/home/sysop/
-fi
+#    echo "Effacement du repertoire"
+#    rm -r /home/sysop/serveurNfcNodeJsVma405
+#    7z x /home/sysop/serveurNfc.7z -o/home/sysop/
+#else
+#    7z x /home/sysop/serveurNfc.7z -o/home/sysop/
+#fi
  chmod -R 774 serveurNfcNodeJsVma405
  chown -R root:sysop  serveurNfcNodeJsVma405
 # echo "-----------------------1"
