@@ -24,35 +24,35 @@ if [ "$#" -ne 6 ]; then
 fi
 
 echo "----- Maj"
-apt-get update && apt-get -y upgrade >> installation.log 2>&1
+apt-get update && apt-get -y upgrade
 echo "----- install Git"
-apt-get install git -y >> installation.log 2>&1
+apt-get install git -y
 
 #Git Clone
 echo "----- clonage du depot"
 
-git clone --branch Mike-sh --single-branch https://github.com/samijuju/installRaspberry.git >> installation.log 2>&1
+git clone --branch Mike-sh --single-branch https://github.com/samijuju/installRaspberry.git
 
 # copie de tous les fichiers ds /home/sysop
-cp -r /home/sysop/installRaspberry/* /home/sysop/ >> installation.log 2>&1
-#cd /home/sysop >> installation.log 2>&1
+cp -r /home/sysop/installRaspberry/* /home/sysop/
+#cd /home/sysop
 
 echo "----- install 7Zip"
-apt-get install p7zip-full -y >> installation.log 2>&1
+apt-get install p7zip-full -y
 echo "----- installxorg"
-apt-get install xserver-xorg -y >> installation.log 2>&1
+apt-get install xserver-xorg -y
 echo "----- install x11"
-apt-get install x11-xserver-utils -y >> installation.log 2>&1
+apt-get install x11-xserver-utils -y
 echo "----- install xinit"
-apt-get install xinit -y >> installation.log 2>&1
+apt-get install xinit -y
 echo "----- install fbturbo"
-apt-get install xserver-xorg-video-fbturbo -y >> installation.log 2>&1
+apt-get install xserver-xorg-video-fbturbo -y
 echo "----- install xdtool"
-apt-get install xdotool -y >> installation.log 2>&1
+apt-get install xdotool -y
 echo "----- install openbox"
-apt-get install openbox -y >> installation.log 2>&1
+apt-get install openbox -y
 echo "----- install chromium...Prends un café c'est un peut long :) "
-apt-get install chromium-browser -y >> installation.log 2>&1
+apt-get install chromium-browser -y
 #echo "fin"
 
 #Ajout lancement serveur X (startx)
@@ -78,14 +78,14 @@ echo "----- Config Ecran"
 ##Création du dossier repos "LCD-show"
 if [ ! -d /home/sysop/LCD-show ] ; then 
     #mkdir /home/sysop/LCD-show
-    git clone https://github.com/goodtft/LCD-show.git >> installation.log 
-    chown -R sysop:sysop /home/sysop/LCD-show >> installation.log 
-    chmod 0775 /home/sysop/LCD-show >> installation.log 
+    git clone https://github.com/goodtft/LCD-show.git
+    chown -R sysop:sysop /home/sysop/LCD-show
+    chmod 0775 /home/sysop/LCD-show
     sed -i "s|^sudo reboot$|# remove sudo reboot|" "/home/sysop/LCD-show/LCD7C-show" 
     sed -i "s|^echo \"reboot now\"$|# remove reboot now|" "/home/sysop/LCD-show/LCD7C-show" 
     chmod +x /home/sysop/LCD-show/LCD7C-show 
     cd /home/sysop/LCD-show
-    ./LCD7C-show 2>&1 | tee -a installation.log
+    ./LCD7C-show   | tee -a installation.log
     echo "hdmi:capacity:7C-1024x600:0:1024:600" > /root/.have_installed 
 fi
 
@@ -105,13 +105,13 @@ echo "----- Configuration de config.txt"
 echo "display_rotate=$rotate" >> /boot/config.txt
 ####
 echo "install libpcsclite1"
-apt-get install libpcsclite1 -y >> installation.log 2>&1
+apt-get install libpcsclite1 -y
 echo "install libpcsclite-dev"
-apt-get install libpcsclite-dev -y >> installation.log 2>&1
+apt-get install libpcsclite-dev -y
 echo "install pcscd"
-apt-get install pcscd -y >> installation.log 2>&1
+apt-get install pcscd -y
 echo "install pcsc-tools"
-apt-get install pcsc-tools -y >> installation.log 2>&1
+apt-get install pcsc-tools -y
 ####
 echo "----- cas lecteur NFC USB"
 ###cas lecteur NFC USB
@@ -144,13 +144,13 @@ apt-get update -y
 apt-get install nodejs -y
 
 echo "----- install gcc"
-apt-get install gcc -y >> installation.log 2>&1
+apt-get install gcc -y
 echo "----- install g++"
-apt-get install g++ -y >> installation.log 2>&1
+apt-get install g++ -y
 echo "----- install make"
-apt-get install make -y >> installation.log 2>&1
+apt-get install make -y
 echo "----- install apt-transport-https"
-apt-get install apt-transport-https -y >> installation.log 2>&1
+apt-get install apt-transport-https -y
 
 cd /home/sysop/
 chmod -R 774 serveurNfcNodeJs
@@ -160,7 +160,7 @@ chown -R root:sysop  serveurNfcNodeJs
 echo "----- Installer les modules node js pour serveurNfc"
 #Installer les modules node js pour serveurNfc
 cd /home/sysop/serveurNfcNodeJs
-npm install >> installation.log 2>&1
+npm install
 
 echo "----- Maj .chromium_env"
 cp /home/sysop/serveurNfcNodeJs/chromium_env.exemple /home/sysop/serveurNfcNodeJs/.chromium_env
@@ -176,11 +176,11 @@ raspi-config nonint do_boot_behaviour B2
 
 #installe "splash screen"
 echo "-----install splash screen"
-apt-get install rpd-plym-splash -y >> installation.log 2>&1
+apt-get install rpd-plym-splash -y
 
 #Installation de "fbi", pour visualiser le splash screen(logo)
 echo "----- Installation de fbi, pour visualiser le splash screen(logo)"
-apt-get install fbi -y >> installation.log 2>&1
+apt-get install fbi -y
 
 #Suppression du logo raspberry pi, modification du fichier /boot/cmdline.txt
 echo "----- Suppression du logo raspberry pi, modification du fichier /boot/cmdline.txt"
