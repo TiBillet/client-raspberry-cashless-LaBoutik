@@ -1,0 +1,280 @@
+body {
+  font-size: 14px;
+  color: #000000;
+  width: 100%;
+  height: 100%;
+  overflow: hidden;
+  position: relative;
+  background: #18252f;
+  color: #fff;
+  height: 100vh;
+  width: 100vw;
+  margin: 0;
+  padding: 0;
+}
+
+.BF-ligne {
+  display: flex;
+  flex-direction: row;
+  /* axe ligne - x */
+  justify-content: center;
+  /* axe colonne - y */
+  align-items: center;
+}
+
+.BF-ligne-deb {
+  display: flex;
+  flex-direction: row;
+  justify-content: flex-start;
+  align-items: center;
+}
+
+.BF-col {
+  display: flex;
+  flex-direction: column;
+  justify-content: center;
+  align-items: center;
+}
+
+.BF-col-deb {
+  display: flex;
+  flex-direction: column;
+  justify-content: center;
+}
+
+.BF-col-haut {
+  display: flex;
+  flex-direction: column;
+  justify-content: flex-start;
+  align-items: center;
+}
+
+/* padding x/y px */
+.p4px {padding: 4px;}
+.p8px {padding: 8px;}
+.p12px {padding: 12px;}
+.p16px {padding: 16px;}
+
+
+/* marges x/y px */
+.m4px {margin: 4px;}
+.m8px {margin: 8px;}
+.m12px {margin: 12px;}
+.m16px {margin: 16px;}
+
+/* marges gauche px */
+.mg4px {margin-left: 4px;}
+.mg8px {margin-left: 8px;}
+.mg12px {margin-left: 12px;}
+.mg16px {margin-left: 16px;}
+
+/* marges droite px */
+.md4px {margin-right: 4px;}
+.md8px {margin-right: 8px;}
+.md12px {margin-right: 12px;}
+.md16px {margin-right: 16px;}
+
+/* marges basse px */
+.mb4px {margin-bottom: 4px;}
+.mb8px {margin-bottom: 8px;}
+.mb12px {margin-bottom: 12px;}
+.mb16px {margin-bottom: 16px;}
+
+/* largeur % */
+.l50p { width: 50%;}
+.l60p { width: 60%;}
+.l99p { width: 99%; }
+.l100p { width: 100%;}
+
+/* hauteur % */
+.h100p { height: 100%; }
+
+/* fonte */
+.ft-gras { font-weight: bold;}
+.ft-1r { font-size: 1rem;}
+.ft-1-5r { font-size: 1.5rem;}
+.ft-2r { font-size: 2rem;}
+
+/* fonds */
+.fond-alerte {
+  background-color: #aa3a3a;
+}
+.fond-retour {
+  background-color: #3b567f;
+}
+.fond-header {
+  background-color: #1a1e25;
+}
+.fond-ok {
+  background-color: #339448;
+}
+
+.fond-info {
+  background-color: #17a2b8;
+}
+
+.fond-pasbon {
+  background-color: #a6adad;
+}
+
+.fond-dev1 {
+  background-color: #040426;
+}
+
+.fond-dev2 {
+  background-color: #0335b8;
+}
+
+.fond-dev3 {
+  background-color: #012584;
+}
+
+.fond-dev4 {
+  background-color: #011549;
+}
+
+.fond-dev5 {
+  background-color: #492601;
+}
+
+.fond-menu-cashless {
+  /*background-color: #b35c22;*/
+  background-color: #af6c7a;
+}
+.fond-coul1 {
+  background-color: #dc6575; /* #8d1737; */
+}
+
+/* couleurs */
+.coulBlanc {
+  color: #ffffff;
+}
+
+.coul-alerte {
+  color: #aa3a3a;
+}
+
+.eff {
+  display: none!important;
+}
+
+.curseur-action {
+  cursor: pointer;
+}
+
+
+/* Header - Menu haut */
+.navbar-horizontal {
+  display: flex;
+  flex-direction: row;
+  width: 100%;
+  border-bottom: 1px solid #303b44;
+  height: 60px;
+}
+
+.navbar-img {
+  width: 120px;
+  height: 100%;
+}
+
+.navbar-nom {
+  width: calc(100% - 120px);
+  height: 100%;
+}
+
+#contenu {
+  width: 100%;
+  height: calc(100% - 140px);
+}
+
+.item-info {
+  font-size: 18px;
+  font-weight: bold;
+  margin: 4px 0;
+}
+
+.bt {
+  height: 60px;
+  display: flex;
+  flex-direction: row;
+  justify-content: center;
+  align-items: center;
+  margin: 4px;
+  padding: 0 16px;
+  font-size: 16px;
+  font-weight: bold;
+  border: 2px solid #000000;
+  border-radius: 4px;
+}
+
+.bt-250px {
+  width: 250px;
+}
+
+.mod-wifi-label, .serveur-label {
+  width: 150px;
+  font-size: 16px;
+  font-weight: bold;
+}
+
+.input-pour-pi {
+  width: calc(100% - 170px);
+  font-size: 24px;
+  font-weight: bold;
+  height: 60px;
+}
+
+#modifier-wifi, #modifier-serveur{
+  width: 100%;
+  border-radius: 4px;
+  border: 2px solid #000000;
+  padding: 4px;
+}
+
+.mod-wifi-erreur, .mod-serveur-erreur {
+  width: 20px;
+  height: 20px;
+  border-radius: 10px;
+  background-color: #8A2400;
+}
+
+.mod-wifi-ok, .mod-serveur-ok {
+  width: 20px;
+  height: 20px;
+  border-radius: 10px;
+  background-color: #47e005;
+}
+
+.bt-valider {
+  width: 150px;
+}
+
+#infos-plus {
+  background-color: #4caf50;
+  width: 100%;
+  overflow: auto;
+}
+
+footer {
+  height: 80px;
+}
+
+/* popup */
+#popup{
+  position: absolute;
+  left: 0;
+  top: 0;
+  height: 100vh;
+}
+
+#popup-contenu {
+  width: 100%;
+  height: calc(100% - 80px);
+}
+
+#popup-footer {
+  width: 100%;
+  height: 80px;
+  font-size: 18px;
+  font-weight: bold;
+}

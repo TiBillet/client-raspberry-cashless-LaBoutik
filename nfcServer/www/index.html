@@ -1,0 +1,38 @@
+<!DOCTYPE html>
+<head>
+  <meta charset="utf-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1">
+  <link rel="stylesheet" href="css/clavier_virtuel.css">
+  <link rel="stylesheet" href="css/index.css">
+  <title>Tibillet</title>
+</head>
+<body>
+  <header class="l100p fond-header">
+    <nav class="navbar-horizontal">
+      <div class="navbar-img BF-col curseur-action" onclick="window.location.reload();">
+        <img alt="TiBillet" src="images/logo.png"/>
+      </div>
+      <div class="navbar-nom BF-ligne">
+        <h1>{{ hostname }}</h1>
+      </div>
+    </nav>
+  </header>
+  <div id="contenu" class="BF-col-haut m4px" data-front-type="{{ fontType }}">
+    <div id="info-serveur"></div>
+    <div id="info-resolution-ecran" class="BF-ligne-deb item-info l100p"> Résolution: ?</div>
+    <div class="BF-ligne-deb item-info l100p">Ip: {{ ip }}</div>
+    <div id="rep-info-reseau"></div>
+    <div class="BF-ligne-deb item-info l100p">Périphérique nfc: {{ device }}</div>
+    <div class="BF-ligne-deb item-info l100p">Type appareil: {{ front_type }}</div>
+    <div class="BF-ligne-deb item-info l100p">tag Id:<span id="nfc"></span></div>
+  </div>
+  <footer class="l100p BF-ligne">
+    <div id="bt-lancer-application" class="fond-pasbon BF-col l100p h100p ft-1-5r ft-gras curseur-action" disabled>
+      <div>LANCER</div>
+      <div>L'APPLICATION</div>
+    </div>
+  </footer>
+  <script src="js/socket.io.js"></script>
+  <script type="module" src="js/index.js"></script>
+</body>
+</html>
