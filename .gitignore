@@ -13,6 +13,7 @@ render.experimental.xml
 google-services.json
 
 # divers
+.vscode
 tempo/
 node_modules/
 .env.json
