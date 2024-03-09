@@ -19,10 +19,7 @@ export const deviceEmitter = new EventEmitter()
 deviceEmitter.emit('nfcReader', 'scanning...')
 
 const softSPI = new SoftSPI({
-  clock: 23, // pin number of SCLK
-  mosi: 19, // pin number of MOSI
-  miso: 21, // pin number of MISO
-  client: 24 // pin number of CS
+  clock: 23, // pin number of SCLKhttps://deb.nodesource.com/node_20.x
 });
 
 // GPIO 24 can be used for buzzer bin (PIN 18), Reset pin is (PIN 22).
