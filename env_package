@@ -1,5 +1,7 @@
 #!/bin/bash
 nfc="gpio"
+server_pin_code="https://discovery.tibillet.coop"
+
 # creation .env.js
 echo "----- Création .env.js"
 echo "export const env = {" > ./nfcServer/.env.js
@@ -12,7 +14,7 @@ else
   echo '  '\"device\": \"acr122u-u9\",  >> ./nfcServer/.env.js
 fi
 
-echo '  '\"server_pin_code\": \"https://discovery.filaos.re\",  >> ./nfcServer/.env.js
+echo '  '\"server_pin_code\": \"$server_pin_code\",  >> ./nfcServer/.env.js
 echo '  '\"hostname\": \"$(hostname)\", >> ./nfcServer/.env.js
 echo '  '\"front_type\": \"FOR\", >> ./nfcServer/.env.js
 echo '  '\"mode_nfc\": \"NFCLO\", >> ./nfcServer/.env.js

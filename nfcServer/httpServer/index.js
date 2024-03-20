@@ -1,4 +1,3 @@
-import { log } from 'console'
 import { typeMime } from './typeMine.js'
 import * as http from 'http'
 import * as httpProxyD from 'http-proxy'

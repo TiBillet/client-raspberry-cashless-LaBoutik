@@ -122,7 +122,7 @@ else
   echo '  '\"device\": \"acr122u-u9\",  >> ./nfcServer/.env.js
 fi
 
-echo '  '\"server_pin_code\": \"https://discovery.filaos.re\",  >> ./nfcServer/.env.js
+echo '  '\"server_pin_code\": \"https://discovery.tibillet.coop\",  >> ./nfcServer/.env.js
 echo '  '\"hostname\": \"$(hostname)\", >> ./nfcServer/.env.js
 echo '  '\"front_type\": \"FOR\", >> ./nfcServer/.env.js
 echo '  '\"mode_nfc\": \"NFCLO\", >> ./nfcServer/.env.js
