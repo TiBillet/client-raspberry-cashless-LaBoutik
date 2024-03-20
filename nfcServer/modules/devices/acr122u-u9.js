@@ -23,6 +23,7 @@ NFC.on('error', err => {
 
 NFC.on('reader', reader => {
   console.log('périphérique nfc connecté !')
+  deviceEmitter.emit('nfcReaderOn')
   // éteint le buzzer
   try {
     reader.connect('CONNECT_MODE_DIRECT').then(() => {
