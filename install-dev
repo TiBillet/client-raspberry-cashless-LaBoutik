@@ -168,6 +168,7 @@ npm i
 Autologin mode console
 raspi-config nonint do_boot_behaviour B2
 
+# en mode test pour le moment
 echo '[Unit]' > /etc/systemd/system/nodejs-nfcServer.service
 echo 'Description=NFC server listen 0.0.0.0 port 3000' >> /etc/systemd/system/nodejs-nfcServer.service
 echo 'After=networking.service' >> /etc/systemd/system/nodejs-nfcServer.service
@@ -185,7 +186,8 @@ echo '[Install]' >> /etc/systemd/system/nodejs-nfcServer.service
 echo 'WantedBy=graphical-session.target' >> /etc/systemd/system/nodejs-nfcServer.service
 
 # activation service
-systemctl enable nodejs-nfcServer.service 
-systemctl start nodejs-nfcServer.service
+#systemctl enable nodejs-nfcServer.service 
+#systemctl start nodejs-nfcServer.service
+#systemctl status nodejs-nfcServer.service
 
 reboot
