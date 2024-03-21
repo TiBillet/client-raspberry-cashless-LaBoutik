@@ -190,17 +190,19 @@ try {
   const socketHandler = (client) => {
     client_globale = client
 
-    client_globale.on('askConfigurationAppFile', (urlATester) => {
+    client_globale.on('askConfigurationAppFile', () => {
       console.log('-> askConfigurationAppFile.')
       readConfigurationApp()
     })
 
     client_globale.on('askUpdateConfigurationFile', (data) => {
+      // TODO: valider data
       console.log('-> askUpdateConfigurationFile')
       writeConfigurationApp(data)
     })
 
     client_globale.on('resetCurrentServer', (data) => {
+      // TODO: valider data
       console.log('-> resetCurrentServer')
       resetCurrentServer(data)
     })
@@ -225,7 +227,6 @@ try {
     })
   }
 
-  // remettre pour la prod
   // lance l'écoute du serveur nfc
   initNfcDevice()
 
@@ -241,9 +242,9 @@ try {
   const optionsServer = {
     socketHandler,
     config: {
-      PORT: 3000,
+      PORT: env.nfc_server_port,
       // TODO: remettre en 127.0.0.1 pour la prod
-      HOST: '127.0.0.1',
+      HOST: env.nfc_server_address,
       // racine du projet = process.cwd()
       PUBLIQUE: process.cwd()+'/www',
       DEBUG: true,
@@ -256,7 +257,7 @@ try {
     console.log(`Single server version ${app.version} (c) filaos974`)
   })
 
- // launchWebBrowser(env)
+ launchWebBrowser(env)
 
 } catch (error) {
   console.log('error', error)

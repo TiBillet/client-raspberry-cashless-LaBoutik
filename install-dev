@@ -3,6 +3,11 @@
 
 #TODO: pour le script final remplacer par $x
 nfc="gpio"
+server_pin_code="https://discovery.filaos.re"
+nfc_server_port=3000
+nfc_server_address="127.0.0.1"
+front_type="FPI"
+
 
 # update
 echo "----- Update system"
@@ -17,9 +22,6 @@ echo "----- install git" -y
 apt-get install git -yS
 echo "----- install nano"
 apt-get install nano -y
-
-echo "----- install chromium...Prends un café c'est un peut long :) "
-apt-get install chromium-browser -y
 
 apt list --installed > log2
 sort log1 log2 | uniq -u > log-install-divers.txt && rm -fr log1 && rm -fr log2
@@ -72,6 +74,16 @@ apt-get install openbox -y
 apt list --installed > log2
 sort log1 log2 | uniq -u > log-install-x11-openbox.txt && rm -fr log1 && rm -fr log2
 
+# install chromium
+apt list --installed > log1
+
+echo "----- install chromium...Prends un café c'est un peut long :) "
+apt-get install chromium-browser -y
+
+apt list --installed > log2
+sort log1 log2 | uniq -u > log-install-chromium.txt && rm -fr log1 && rm -fr log2
+
+
 # config startx
 if grep "#modif bashrc = ok" /home/sysop/.bashrc > /dev/null
 then
@@ -122,11 +134,13 @@ else
   echo '  '\"device\": \"acr122u-u9\",  >> ./nfcServer/.env.js
 fi
 
-echo '  '\"server_pin_code\": \"https://discovery.tibillet.coop\",  >> ./nfcServer/.env.js
+echo '  '\"server_pin_code\": \"$server_pin_code\",  >> ./nfcServer/.env.js
 echo '  '\"hostname\": \"$(hostname)\", >> ./nfcServer/.env.js
-echo '  '\"front_type\": \"FOR\", >> ./nfcServer/.env.js
+echo '  '\"front_type\": \"$front_type\", >> ./nfcServer/.env.js
 echo '  '\"mode_nfc\": \"NFCLO\", >> ./nfcServer/.env.js
 echo '  '\"current_server\": \"\", >> ./nfcServer/.env.js
+echo '  '\"nfc_server_port\": $nfc_server_port, >> ./nfcServer/.env.js
+echo '  '\"nfc_server_address\": \"$nfc_server_address\", >> ./nfcServer/.env.js
 echo '  '\"servers\": [], >> ./nfcServer/.env.js
 echo '  '\"exeChromium\": \"chromium-browser\", >> ./nfcServer/.env.js
 echo '  '\"dev\": true >> ./nfcServer/.env.js
@@ -168,26 +182,22 @@ npm i
 Autologin mode console
 raspi-config nonint do_boot_behaviour B2
 
-# en mode test pour le moment
-echo '[Unit]' > /etc/systemd/system/nodejs-nfcServer.service
-echo 'Description=NFC server listen 0.0.0.0 port 3000' >> /etc/systemd/system/nodejs-nfcServer.service
-echo 'After=networking.service' >> /etc/systemd/system/nodejs-nfcServer.service
-echo 'Requires=network.target' >> /etc/systemd/system/nodejs-nfcServer.service
-echo 'PartOf=graphical-session.target' >> /etc/systemd/system/nodejs-nfcServer.service
-echo '' >> /etc/systemd/system/nodejs-nfcServer.service
-echo '[Service]' >> /etc/systemd/system/nodejs-nfcServer.service
-echo 'Environment=NFC_SERVER_PORT=3000' >> /etc/systemd/system/nodejs-nfcServer.service
-echo 'Type=simple' >> /etc/systemd/system/nodejs-nfcServer.service
-echo 'WorkingDirectory=/home/sysop/nfcServer/' >> /etc/systemd/system/nodejs-nfcServer.service
-echo 'Restart=on-failure' >> /etc/systemd/system/nodejs-nfcServer.service
-echo 'ExecStart=/usr/bin/node nfcServer.js' >> /etc/systemd/system/nodejs-nfcServer.service
-echo '' >> /etc/systemd/system/nodejs-nfcServer.service
-echo '[Install]' >> /etc/systemd/system/nodejs-nfcServer.service
-echo 'WantedBy=graphical-session.target' >> /etc/systemd/system/nodejs-nfcServer.service
+# configuration x11 et démarrage du serveur nfc
+# TODO: ajouter rotation écran si besoin
+echo  > /etc/xdg/openbox/autostart
+echo '# stop veille/économie dénergie' >> /etc/xdg/openbox/autostart
+echo 'xset dpms 0 0 0 && xset s noblank  && xset s off' >> /etc/xdg/openbox/autostart
+echo  >> /etc/xdg/openbox/autostart
+echo '# vidage du cache chromium' >> /etc/xdg/openbox/autostart
+echo rm -fr /home/sysop/.cache/chromium >> /etc/xdg/openbox/autostart
+echo rm -fr /home/sysop/.config/chromium/Default/ >> /etc/xdg/openbox/autostart
+echo  >> /etc/xdg/openbox/autostart
+echo '# lance le seveur nfc' >> /etc/xdg/openbox/autostart
+echo cd /home/sysop/nfcServer/ >> /etc/xdg/openbox/autostart
+echo node nfcServer.js  >> /etc/xdg/openbox/autostart
 
-# activation service
-#systemctl enable nodejs-nfcServer.service 
-#systemctl start nodejs-nfcServer.service
-#systemctl status nodejs-nfcServer.service
+chown root:root /etc/xdg/openbox/autostart
+chmod 755 /etc/xdg/openbox/autostart
+
 
 reboot

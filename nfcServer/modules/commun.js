@@ -94,6 +94,7 @@ export function getIp(typeReseau, famille) {
   }
 }
 
+/*
 export function launchBrowser(nameProcess, options) {
   let msgErreur = "", config, infoNfcServer
 
@@ -121,110 +122,55 @@ export function launchBrowser(nameProcess, options) {
       console.log(`--> ${nameProcess} démarrer !`)
     }
   })
-
-}
-
-
-/*
-export function launchWebBrowser(state) {
-  // console.log("-> fonction lancerChromium !");
-
-  let optionsChromium = [],
-    msgErreur = "",
-    config
-
-  try {
-    config = readJson("./.env.json")
-  } catch (err) {
-    msgErreur = err
-  }
-
-  if (msgErreur === "") {
-    const infosServerNfc = getInfosServerNfc(config.urlServerNfc)
-    const PORT = infosServerNfc.port
-    const ADDR = infosServerNfc.adresse
-    if (state === 1) {
-      // dev
-      if (config.dev === true) {
-        optionsChromium = [
-          "--allow-running-insecure-content",
-          "--disable-features=Translate",
-          "--disable-pinch",
-          "--remote-debugging-port=9222",
-          "--noerrdialogs",
-          "--disable-infobars",
-          "--check-for-update-interval=31536000",
-          "http://" + ADDR + ":" + PORT
-        ]
-      } else {
-        // prod
-        optionsChromium = ["--allow-running-insecure-content", "--disable-features=Translate", "--disable-pinch", "--noerrdialogs", "--disable-infobars", "--check-for-update-interval=31536000", "http://localhost:" + PORT]
-      }
-    } else {
-      // dev
-      // console.log("-> etape 2, url = ", config.url);
-      if (config.dev === true) {
-        optionsChromium = ["--disable-features=Translate", "--disable-pinch", "--remote-debugging-port=9222", "--noerrdialogs", "--disable-infobars", "--check-for-update-interval=31536000", config.url]
-      } else {
-        // prod
-        optionsChromium = ["--disable-features=Translate", "--disable-pinch", "--noerrdialogs", "--disable-infobars", "--check-for-update-interval=31536000", config.url]
-      }
-    }
-
-    // mode kiosk uniquement pi
-    if (config.fronType === "FPI") {
-      optionsChromium.push("--kiosk")
-    }
-
-    if (msgErreur === "") {
-      const userAgent = `{"hostname":"${config.hostname}", "token": "${config.token}", "password":"${config.password}","modeNfc":"${config.modeNfc}","front":"${config.frontType}","ip":"${getIp("public", "ipv4")}"}`
-      // console.log('userAgent = ', userAgent)
-
-      optionsChromium.push(`--user-agent=${userAgent}`)
-      // console.log("optionsChromium = ", optionsChromium);
-
-      // Lance chromium
-      const demChromium = spawn(config.exeChromium, optionsChromium)
-
-      demChromium.stdout.on("data", (data) => {
-        console.log(`demChromium - stdout: ${data}`)
-      })
-
-      demChromium.stderr.on("data", (data) => {
-        console.error(`demChromium - stderr: ${data}`)
-      })
-
-      demChromium.on("close", (code) => {
-        console.log(`demChromium - child process exited with code ${code}`)
-        if (code === 0) {
-          console.log("--> Chromium démarrer !")
-        }
-      })
-    }
-  } else {
-    console.log("Erreur: ", msgErreur)
-  }
 }
 */
 
 export function launchWebBrowser(env) {
-  console.log('-> launchWebBrowser, env =', env);
-  /*
-  // dev
-  if (config.dev === true) {
-    optionsBrowser = [
-      "--allow-running-insecure-content",
-      "--disable-features=Translate",
-      "--disable-pinch",
-      "--remote-debugging-port=9222",
-      "--noerrdialogs",
-      "--disable-infobars",
-      "--check-for-update-interval=31536000",
-      "http://" + ADDR + ":" + PORT
-    ]
-  } else {
-    // prod
-    optionsBrowser = ["--allow-running-insecure-content", "--disable-features=Translate", "--disable-pinch", "--noerrdialogs", "--disable-infobars", "--check-for-update-interval=31536000", "http://localhost:" + PORT]
+  // env.dev = false
+  console.log('-> launchWebBrowser, env =', env)
+  let optionsBrowser
+  try {
+    // dev
+    if (env.dev === true) {
+      optionsBrowser = [
+        "--allow-running-insecure-content",
+        "--disable-features=Translate",
+        "--disable-pinch",
+        "--remote-debugging-port=9222",
+        "--check-for-update-interval=31536000",
+        "http://" + env.nfc_server_address + ":" + env.nfc_server_port
+      ]
+    } else {
+      // prod
+      optionsBrowser = ["--allow-running-insecure-content", "--disable-features=Translate", "--disable-pinch", "--noerrdialogs", "--disable-infobars", "--check-for-update-interval=31536000", "http://" + env.nfc_server_address + ":" + env.nfc_server_port]
+    }
+
+    // mode kiosk uniquement pi
+    if (env.front_type === "FPI" && env.dev === false) {
+      optionsBrowser.push("--kiosk")
+    }
+
+    console.log('optionsBrowser =', optionsBrowser)
+
+    // Lance chromium
+    const demChromium = spawn(env.exeChromium, optionsBrowser, {uid: 1000, gid: 1000})
+
+    demChromium.stdout.on("data", (data) => {
+      console.log(`chromium - stdout: ${data}`)
+    })
+
+    demChromium.stderr.on("data", (data) => {
+      console.error(`chromium - stderr: ${data}`)
+    })
+
+    demChromium.on("close", (code) => {
+      console.log(`chromium - child process exited with code ${code}`)
+      if (code === 0) {
+        console.log("--> Chromium démarrer !")
+      }
+    })
+
+  } catch (error) {
+    console.log('-> launchWebBrowser,', error)
   }
-  */
 }

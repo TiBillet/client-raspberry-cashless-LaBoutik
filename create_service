@@ -1,0 +1,23 @@
+#!/bin/bash
+nfc_server_port=3000
+
+# en mode test pour le moment
+echo '[Unit]' > /etc/systemd/system/nodejs-nfcServer.service
+echo Description=NFC server listen 0.0.0.0 port $nfc_server_port >> /etc/systemd/system/nodejs-nfcServer.service
+echo 'After=graphical.target systemd-user-sessions.service' >> /etc/systemd/system/nodejs-nfcServer.service
+echo '' >> /etc/systemd/system/nodejs-nfcServer.service
+echo '[Service]' >> /etc/systemd/system/nodejs-nfcServer.service
+echo Environment=\"NFC_SERVER_PORT=$nfc_server_port\" >> /etc/systemd/system/nodejs-nfcServer.service
+echo 'Type=idle' >> /etc/systemd/system/nodejs-nfcServer.service
+echo 'WorkingDirectory=/home/sysop/nfcServer/' >> /etc/systemd/system/nodejs-nfcServer.service
+echo 'Restart=always' >> /etc/systemd/system/nodejs-nfcServer.service
+echo 'ExecStart=/home/sysop/nfcServer/startNfcServer' >> /etc/systemd/system/nodejs-nfcServer.service
+echo '' >> /etc/systemd/system/nodejs-nfcServer.service
+echo '[Install]' >> /etc/systemd/system/nodejs-nfcServer.service
+echo 'WantedBy=graphical.target' >> /etc/systemd/system/nodejs-nfcServer.service
+
+# activation service
+#systemctl daemon-reload
+#systemctl enable nodejs-nfcServer.service 
+#systemctl start nodejs-nfcServer.service
+#systemctl status nodejs-nfcServer.service
