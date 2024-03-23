@@ -1,5 +1,9 @@
+import { Keyboard } from '../virtualKeyboard/vk.js'
+
 // initialisation
 window.store = {}
+const keyboard = new Keyboard(45)
+
 let socket = io(location.origin)
 let configuration
 let devicesStatus = [
@@ -154,7 +158,7 @@ window.startApp = async function () {
 socket.on('writeConfigurationAppStatus', (retour) => {
   if (retour.status === true) {
     configuration = retour.configuration
-    console.log( '-> writeConfigurationAppStatus, configuration =', configuration);
+    console.log('-> writeConfigurationAppStatus, configuration =', configuration)
   }
 
   // reset configuration serveur courant
@@ -237,4 +241,5 @@ document.addEventListener('DOMContentLoaded', function () {
   let resolution = document.body.clientWidth + 'x' + document.body.clientHeight
   document.querySelector('#info-resolution-ecran').innerText = resolution
 
+  keyboard.run()
 })

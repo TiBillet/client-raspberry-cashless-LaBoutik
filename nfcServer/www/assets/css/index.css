@@ -145,3 +145,11 @@ body {
   background-color: #160101;
   opacity: 0.9;
 }
+
+.simple-keyboard {
+  display: none;
+}
+
+.show-keyboard {
+  display: block;
+}

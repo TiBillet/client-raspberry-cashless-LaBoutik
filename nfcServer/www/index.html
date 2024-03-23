@@ -3,7 +3,7 @@
 <head>
   <meta charset="utf-8">
   <meta name="viewport" content="width=device-width, initial-scale=1">
-  <link rel="stylesheet" href="assets/css/clavier_virtuel.css">
+  <link rel="stylesheet" href="assets/virtualKeyboard/vk.css">
   <link rel="stylesheet" href="assets/css/index.css">
   <title>Tibillet</title>
 </head>
@@ -22,7 +22,7 @@
     <div id="step-1" class="conteneur BF-col" style="display: none">
       <div id="field-pin" class="ligne BF-col">
         <div class="info" for="pin">Code pin :</div>
-        <input type="number" id="pinCode" class="entree"
+        <input type="number" id="pinCode" class="entree keyboard-use"
           style="font-size: 1.2rem; background-color: #ffffff; color: black" />
       </div>
       <div id="retour-pin-code" class="info-danger"></div>
@@ -75,9 +75,7 @@
       </div>
     </div>
   </div>
-  <!-- boutton test
-  <div id="bt-reset-nfc" class="action c-blue" style="position:absolute;top:0;left:0;">Test</div>
-  -->
+  <div class="keyboard keyboard-hidden"></div>
   <script src="assets/js/socket_io.js"></script>
   <script type="module" src="assets/js/index.js"></script>
 </body>
