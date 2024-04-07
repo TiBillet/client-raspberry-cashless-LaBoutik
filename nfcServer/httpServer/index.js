@@ -75,6 +75,12 @@ export class MTE {
       }
       //console.log('-> methode =', methode, '  --  routes (post) =', this.routes)
 
+      if (methode === 'OPTIONS') {
+        res.writeHead(204, headers)
+        res.end()
+        return
+      }
+
       //midleware
       this.listFonctions.forEach((fonc) => {
         fonc.call(this, req, res, headers)
@@ -83,10 +89,7 @@ export class MTE {
       const route = this.routes.find(obj => obj.name === url)
       // console.log('url =',if (logLevel === 2) { url, '  --  route =', route)  
 
-      if (methode === 'OPTIONS') {
-        res.writeHead(200, headers)
-        res.end()
-      }
+        console.log('--------> methode =', methode);
 
       if (methode === 'POST') {
         // réception des données

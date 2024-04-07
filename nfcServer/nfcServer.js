@@ -39,9 +39,17 @@ const transaction = Sentry.startTransaction({
 })
 */
 
+const headers = {
+  'Access-Control-Allow-Origin': '*',
+  "Access-Control-Allow-Methods": "GET, PUT, POST, DELETE, OPTIONS",
+  "Access-Control-Allow-Headers": "Content-Type, Authorization, Content-Length, X-Requested-With",
+  "Access-Control-Max-Age": 2592000 // 30 days
+}
+
 
 function readConfigFile(req, res) {
   let retour
+  headers["Content-Type"] = "application/json" 
   const configFromFile = readJson(root + '/' + saveFileName)
   if (configFromFile !== null) {
     retour = JSON.parse(configFromFile)
@@ -53,7 +61,6 @@ function readConfigFile(req, res) {
     uuid: createUuidPiFromMacAddress(),
     hostname: os.hostname()
   }
-  const headers = { "Content-Type": "application/json" }
   res.writeHead(200, headers)
   res.write(JSON.stringify(retour))
   res.end()
@@ -61,7 +68,7 @@ function readConfigFile(req, res) {
 
 function writeConfigFile(req, res, rawBody) {
   // console.log('-> writeConfigFile, rawBody =', rawBody)
-  const headers = { "Content-Type": "application/json" }
+  headers["Content-Type"] = "application/json" 
   try {
     const result = writeJson(root + '/' + saveFileName, rawBody)
     if (result.status === true) {
