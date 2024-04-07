@@ -2,6 +2,7 @@ import * as fs from "node:fs"
 import * as IP from "ip"
 import { spawn } from "child_process"
 import * as process from "node:process"
+import * as os from 'node:os'
 
 const root = process.cwd()
 const config = readJson(root + "/.env.json")
@@ -45,7 +46,6 @@ export function logs(msg) {
   }
 }
 
-
 export function readJson(path) {
   try {
     const fileExists = fs.existsSync(path)
@@ -63,7 +63,7 @@ export function readJson(path) {
 
 export function writeJson(path, data) {
   try {
-    fs.writeFileSync(path, JSON.stringify(data, null, 2))
+    fs.writeFileSync(path, JSON.stringify(data))
     return { status: true, msg: '' }
   } catch (error) {
     console.log("sauvegarde fichier de configuration,", error.message)
@@ -93,6 +93,21 @@ export function getIp(typeReseau, famille) {
     return "127.0.0.1"
   }
 }
+
+export function createUuidPiFromMacAddress() {
+  const obj = os.networkInterfaces()
+  const ip = getIp('public', 'ipv4')
+  let retour = 'xxxxxxxxxxxx'
+  for (let [key, value] of Object.entries(obj)) {
+    const result = value.find(item => item.address === ip)
+    if (result !== undefined) {
+      retour = result.mac.replace(/:/g, '')
+      break
+    }
+  }
+  return retour
+}
+
 
 /*
 export function launchBrowser(nameProcess, options) {
@@ -125,7 +140,7 @@ export function launchBrowser(nameProcess, options) {
 }
 */
 
-export function launchWebBrowser(env) {
+export function startBrowser(env) {
   // env.dev = false
   console.log('-> launchWebBrowser, env =', env)
   let optionsBrowser
@@ -138,6 +153,7 @@ export function launchWebBrowser(env) {
         "--disable-pinch",
         "--remote-debugging-port=9222",
         "--check-for-update-interval=31536000",
+        "--noerrdialogs", "--disable-infobars",
         "http://" + env.nfc_server_address + ":" + env.nfc_server_port
       ]
     } else {

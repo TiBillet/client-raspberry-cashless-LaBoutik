@@ -2,31 +2,32 @@
 nfc="gpio"
 server_pin_code="https://discovery.filaos.re"
 nfc_server_port=3000
-nfc_server_address="127.0.0.1"
+nfc_server_address="localhost"
 front_type="FPI"
 
 # creation .env.js
 echo "----- Création .env.js"
 echo "export const env = {" > ./nfcServer/.env.js
-if [ $nfc = 'gpio' ]
-then
-  # gpio
-  echo '  '\"device\": \"vma405-rfid-rc522\",  >> ./nfcServer/.env.js
-else
-  # usb
-  echo '  '\"device\": \"acr122u-u9\",  >> ./nfcServer/.env.js
-fi
-
-echo '  '\"server_pin_code\": \"$server_pin_code\",  >> ./nfcServer/.env.js
-echo '  '\"hostname\": \"$(hostname)\", >> ./nfcServer/.env.js
-echo '  '\"front_type\": \"$front_type\", >> ./nfcServer/.env.js
 echo '  '\"mode_nfc\": \"NFCLO\", >> ./nfcServer/.env.js
+echo '  '\"front_type\": \"$front_type\", >> ./nfcServer/.env.js
+echo '  '\"server_pin_code\": \"$server_pin_code\",  >> ./nfcServer/.env.js
+echo '  '\"servers\": [], >> ./nfcServer/.env.js
+echo '  '\"client\": null, >> ./nfcServer/.env.js
 echo '  '\"current_server\": \"\", >> ./nfcServer/.env.js
 echo '  '\"nfc_server_port\": $nfc_server_port, >> ./nfcServer/.env.js
 echo '  '\"nfc_server_address\": \"$nfc_server_address\", >> ./nfcServer/.env.js
-echo '  '\"servers\": [], >> ./nfcServer/.env.js
 echo '  '\"exeChromium\": \"chromium-browser\", >> ./nfcServer/.env.js
-echo '  '\"dev\": true >> ./nfcServer/.env.js
+echo '  '\"dev\": true, >> ./nfcServer/.env.js
+echo '  '\"version\": \"2.24.04.07.15.57\", >> ./nfcServer/.env.js
+echo '  '\"logLevel\": 1, >> ./nfcServer/.env.js
+if [ $nfc = 'gpio' ]
+then
+  # gpio
+  echo '  '\"device\": \"vma405-rfid-rc522\"  >> ./nfcServer/.env.js
+else
+  # usb
+  echo '  '\"device\": \"acr122u-u9\"  >> ./nfcServer/.env.js
+fi
 echo "}" >> ./nfcServer/.env.js
 
 # creation package.json

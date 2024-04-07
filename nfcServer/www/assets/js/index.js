@@ -2,7 +2,7 @@ import { Keyboard } from '../virtualKeyboard/vk.js'
 
 // initialisation
 window.store = {}
-const keyboard = new Keyboard(45)
+window.keyboard = new Keyboard(45)
 
 let socket = io(location.origin)
 let configuration
@@ -55,7 +55,7 @@ function showNoNfc() {
 
 /**
  * insert/affiche des messages dans l'élément #app-log
- * 
+ * const response = await fetch('/config_file')
  * @param {string} message - votre message
  * @param {string} typeMessage - '' ou 'danger', modifie la couleur du message
  */
@@ -65,6 +65,45 @@ function afficherMessage(message, typeMessage) {
     styleMessage = `style="color:#F00;"`
   }
   document.querySelector('#tag-id').insertAdjacentHTML('afterend', `<div ${styleMessage}>${message}</div>`)
+}
+
+function generatePassword(length) {
+  const chars = "0123456789abcdefghijklmnopqrstuvwxyz!@#$%^&*()ABCDEFGHIJKLMNOPQRSTUVWXYZ"
+  let password = ""
+  const array = new Uint32Array(length)
+  window.crypto.getRandomValues(array)
+  for (let i = 0; i < length; i++) {
+    password += chars[array[i] % chars.length] // % operator returns remainder of division
+  }
+  return password
+}
+
+
+async function readFromFile() {
+  try {
+    const response = await fetch('/config_file')
+    return await response.json()
+  } catch (error) {
+    createUuidPiFromMacAddress
+    console.log('readFromFile,', error)
+    return null
+  }
+}
+
+async function writeToFile(configuration) {
+  // console.log('-> writeToFile, configuration =', writeToFile)
+  try {
+    const response = await fetch('/write_config_file', {
+      mode: 'cors',
+      method: 'POST',
+      body: JSON.stringify(configuration)
+    })
+    const retour = await response.json()
+    return retour.status
+  } catch (error) {
+    console.log('writeToFile,', error)
+    return false
+  }
 }
 
 window.showStep1 = function () {
@@ -77,7 +116,7 @@ window.showStep1 = function () {
   document.querySelector('#retour-pin-code').innerText = ''
   // fichier de configuration présent
   if (configuration.current_server !== '') {
-    // affichage du bouton annuler de l'interface #step-1 pour une future utilisation
+    // affichage du bouton annuler de l'interface #step-1 pour une futurecreateUuidPiFromMacAddress utilisation
     document.querySelector('#step1-bt-annuler').style.display = 'flex'
   }
 }
@@ -104,29 +143,111 @@ window.confirmReset = function () {
 }
 
 /**
+ * Find specific server in configuration
+ * @param {string} urlServer - server to find 
+ * @param {object} configuration - app configuration 
+ * @returns {undefined|object}
+ */
+function findDataServerFromConfiguration(urlServer, configuration) {
+  if (urlServer === undefined) {
+    return undefined
+  }
+  return configuration.servers.find(item => item.server === urlServer)
+}
+
+/**
+ * Update configuration file
+ * @param {object} retour 
+ * @returns {boolean}
+ */
+async function updateConfigurationFile(options) {
+  console.log('-> updateConfigurationFile, configuration =', JSON.stringify(configuration, null, 2))
+  console.log('options =', JSON.stringify(options, null, 2))
+
+  configuration['hostname'] = options.hostname
+  configuration['uuidDevice'] = configuration.piDeviceUuid
+  configuration['pin_code'] = options.pinCode
+  configuration.client = {
+    password: generatePassword(30),
+    username: options.username
+  }
+
+  const testServerIn = findDataServerFromConfiguration(options.retour.server_url, configuration)
+  const newServer = {
+    server: options.retour.server_url,
+    // locale: options.retour.locale,
+    publicKeyPem: options.retour.server_public_pem
+  }
+
+  // serveur inéxistant dans le fichier de conf, ajouter le
+  if (testServerIn === undefined) {
+    configuration.servers.push(newServer)
+  } else {
+    const filterServers = configuration.servers.filter(item => item.server !== options.retour.server_url)
+    configuration.servers = filterServers
+    configuration.servers.push(newServer)
+  }
+
+  configuration.current_server = options.retour.server_url
+  return await writeToFile(configuration)
+
+}
+
+/**
  * get pin code from "server pinCode"
  */
 window.getUrlServerFromPinCode = async function () {
-  // console.log('-> getUrlServerFromPinCode.')
+  console.log('-> getUrlServerFromPinCode, configuration =', configuration)
   const valueElement = document.querySelector('#pinCode').value
-  if (valueElement !== '') {
+  let errorMsg = ''
+  // validation nombre et taille = 6
+  if (isNaN(valueElement) === true) {
+    errorMsg += 'Un nombre'
+  }
+  if (valueElement.length != 6) {
+    if (errorMsg !== '') {
+      errorMsg += ' de '
+    }
+    errorMsg += '6 chiffres'
+  }
+
+  if (errorMsg === '') {
     const pinCode = parseInt(valueElement)
+    const hostname = slugify('pi-' + configuration.piDevice.hostname + '-' + configuration.piDevice.uuid)
+    // client/app
+    let username
+    if (window.crypto.randomUUID) {
+      username = slugify(hostname + '-' + window.crypto.randomUUID())
+    } else {
+      username = slugify(hostname + '-' + (window.URL.createObjectURL(new Blob([])).substring(31)))
+    }
 
     // console.log('pinCode =', pinCode)
     // curl -X POST https://discovery.filaos.re/pin_code/ -H "Content-Type: application/x-www-form-urlencoded" -d "pin_code=695610" -v
     try {
-      console.log('-> fetch, url =', configuration.server_pin_code + '/pin_code/')
       let data = new URLSearchParams()
       data.append('pin_code', pinCode)
+      data.append('hostname', hostname)
+      data.append('username', username)
       const response = await fetch(configuration.server_pin_code + '/pin_code/', {
         mode: 'cors',
         method: 'POST',
         body: data
       })
       const retour = await response.json()
-      console.log('-> getUrlServerFromPinCode, retour =', retour)
+      // console.log('-> getUrlServerFromPinCode, retour =', retour)
       if (response.status === 200) {
-        socket.emit('askUpdateConfigurationFile', { askFrom: 'getUrlServerFromPinCode', retour, pinCode })
+        const retourUpdate = await updateConfigurationFile({ retour, pinCode, hostname, username })
+        // console.log('retourUpdate =', retourUpdate)
+        if (retourUpdate === false) {
+          afficherMessage('Erreur lors de mise à jour de la configuration.', 'danger')
+        } else {
+          afficherMessage('Mise à jour de la configuration.')
+        }
+
+        showStep2()
+        // info
+        document.querySelector('#info-server').innerText = configuration.current_server
       } else {
         throw new Error('No server from this pinCode')
       }
@@ -136,15 +257,26 @@ window.getUrlServerFromPinCode = async function () {
       document.querySelector('#retour-pin-code').innerText = err.message
     }
   } else {
-    document.querySelector('#retour-pin-code').innerText = "No pinCode"
+    document.querySelector('#retour-pin-code').innerText = errorMsg
   }
 }
+
 
 // supprime la configuration du serveur courant
 window.reset = async function () {
   // supprime le serveur courrant
   const newServers = configuration.servers.filter(item => item.server !== configuration.current_server)
-  socket.emit('resetCurrentServer', { askFrom: 'reset', newServers })
+  configuration.servers = newServers
+  configuration.client = null
+  configuration.current_server = ''
+  const retour = await writeToFile(configuration)
+  // console.log('-> reset, retour =', retour)
+  if (retour === true) {
+    afficherMessage(`Reset: serveur supprimé.`)
+  } else {
+    afficherMessage(`Erreur, lors du reset.`, 'danger')
+  }
+  showStep1()
 }
 
 /**
@@ -155,64 +287,6 @@ window.startApp = async function () {
   window.location = configuration.current_server + urlLogin
 }
 
-socket.on('writeConfigurationAppStatus', (retour) => {
-  if (retour.status === true) {
-    configuration = retour.configuration
-    console.log('-> writeConfigurationAppStatus, configuration =', configuration)
-  }
-
-  // reset configuration serveur courant
-  if (retour.askFrom === 'reset') {
-    if (retour.status === true) {
-      afficherMessage(`Reset: serveur supprimé.`)
-    } else {
-      afficherMessage(`Erreur, lors du reset.`, 'danger')
-    }
-    showStep1()
-  }
-
-  if (retour.askFrom === 'getUrlServerFromPinCode') {
-    if (retour.status !== true) {
-      afficherMessage('Erreur lors de mise à jour de la configuration.', 'danger')
-    } else {
-      afficherMessage('Mise à jour de la configuration.')
-    }
-
-    showStep2()
-    // info
-    document.querySelector('#info-server').innerText = configuration.current_server
-  }
-
-})
-
-socket.on('returnConfigurationApp', (retour) => {
-  // console.log('-> msg "returnConfigurationApp",  retour =', retour)
-  configuration = retour
-
-  // dev supprimer pour prod
-  configuration.nfcStatusOn = true
-
-  // nfc status
-  if (configuration.nfcStatusOn !== true) {
-    showNoNfc()
-  }
-  if (configuration.ip === "127.0.0.1") {
-    showNoNetwork()
-  }
-
-  // devices on
-  if (configuration.nfcStatusOn === true && configuration.ip !== "127.0.0.1") {
-    if (configuration.current_server === '') {
-      // entrer code pin
-      showStep1()
-    } else {
-      // lancer application / modifier server / reset serveur courant
-      showStep2()
-    }
-
-    afficherMessage('ip : ' + configuration.ip)
-  }
-})
 
 socket.on('tagIdChange', (retour) => {
   document.querySelector('#tag-id').innerHTML = retour
@@ -220,13 +294,7 @@ socket.on('tagIdChange', (retour) => {
 })
 
 
-document.addEventListener('DOMContentLoaded', function () {
-  /*
-  document.querySelector('#bt-reset-nfc').addEventListener('click', function () {
-    console.log('-> resetNfc')
-    socket.emit('resetNfc')
-  })
-  */
+document.addEventListener('DOMContentLoaded', async function () {
 
   // efface le conteneur des alertes
   document.querySelector('#affichage-alertes').style.display = 'none'
@@ -236,10 +304,22 @@ document.addEventListener('DOMContentLoaded', function () {
 
   // affiche l' interface principale
   document.querySelector('#entree-des-donnees').style.display = 'flex'
-  socket.emit('askConfigurationAppFile')
+  //socket.emit('askConfigurationAppFile')
 
   let resolution = document.body.clientWidth + 'x' + document.body.clientHeight
   document.querySelector('#info-resolution-ecran').innerText = resolution
 
   keyboard.run()
+
+  // récupérer la configuration
+  configuration = await readFromFile()
+  console.log('-> init app, configuration =', JSON.stringify(configuration, null, 2))
+  if (configuration.current_server === '') {
+    // entrer code pin
+    showStep1()
+  } else {
+    // lancer application / modifier server / reset serveur courant
+    showStep2()
+  }
+
 })

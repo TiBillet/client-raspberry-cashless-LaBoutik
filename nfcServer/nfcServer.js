@@ -1,5 +1,8 @@
+// sudo apt install -y lsof
+// sudo lsof -nP -iTCP:3000 -sTCP:LISTEN
+
 import { MTE } from './httpServer/index.js'
-import { readJson, writeJson, getIp, launchWebBrowser } from './modules/commun.js'
+import { readJson, writeJson, getIp, createUuidPiFromMacAddress, startBrowser } from './modules/commun.js'
 import * as Sentry from '@sentry/node'
 import { ProfilingIntegration } from "@sentry/profiling-node"
 import { env } from './.env.js'
@@ -11,6 +14,11 @@ const root = process.cwd()
 const saveFileName = 'configLaboutik.json'
 const slugify = SLUGIFY.default
 let retour = null, client_globale, appDeviceEmitter = null
+
+// 1 - affiche messages des appels socket.io et leurs méthodes uniquement
+// 2 - url et méthodes affiliées
+// 10 - tous les logs
+const logLevel = env.logLevel
 
 /*
 // sentry
@@ -31,6 +39,49 @@ const transaction = Sentry.startTransaction({
 })
 */
 
+
+function readConfigFile(req, res) {
+  let retour
+  const configFromFile = readJson(root + '/' + saveFileName)
+  if (configFromFile !== null) {
+    retour = JSON.parse(configFromFile)
+  } else {
+    retour = env
+  }
+  retour['piDevice'] = {
+    ip: getIp('public', 'ipv4'),
+    uuid: createUuidPiFromMacAddress(),
+    hostname: os.hostname()
+  }
+  const headers = { "Content-Type": "application/json" }
+  res.writeHead(200, headers)
+  res.write(JSON.stringify(retour))
+  res.end()
+}
+
+function writeConfigFile(req, res, rawBody) {
+  // console.log('-> writeConfigFile, rawBody =', rawBody)
+  const headers = { "Content-Type": "application/json" }
+  try {
+    const result = writeJson(root + '/' + saveFileName, rawBody)
+    if (result.status === true) {
+      res.writeHead(200, headers)
+      res.write(JSON.stringify(result))
+      res.end()
+    } else {
+      res.writeHead(400, headers)
+      res.write(JSON.stringify(result))
+      res.end()
+    }
+  } catch (error) {
+    // writeJson(path, data)
+    res.writeHead(400, headers)
+    res.write(JSON.stringify({ error }))
+    res.end()
+  }
+}
+
+/*
 function getConfigurationApp() {
   let retour
   const configFromFile = readJson(root + '/' + saveFileName)
@@ -42,6 +93,8 @@ function getConfigurationApp() {
   retour['ip'] = getIp('public', 'ipv4')
   return retour
 }
+*/
+
 
 function readConfigurationApp() {
   client_globale.emit("returnConfigurationApp", getConfigurationApp())
@@ -60,19 +113,6 @@ function findDataServerFromConfiguration(urlServer, configuration) {
   return configuration.servers.find(item => item.server === urlServer)
 }
 
-function getMacAddressFromIp() {
-  const obj = os.networkInterfaces()
-  const ip = getIp()
-  let retour = 'xxxxxxxxxxxx'
-  for (let [key, value] of Object.entries(obj)) {
-    const result = value.find(item => item.address === ip)
-    if (result !== undefined) {
-      retour = result.mac.replace(/:/g, '')
-      break
-    }
-  }
-  return retour
-}
 
 function generatePassword(length) {
   const chars = "0123456789abcdefghijklmnopqrstuvwxyz!@#$%^&*()ABCDEFGHIJKLMNOPQRSTUVWXYZ"
@@ -85,8 +125,12 @@ function generatePassword(length) {
   return password
 }
 
+/*
 function writeConfigurationApp(data) {
-  console.log('-> writeConfigurationApp, data =', data)
+  if (logLevel === 1 || logLevel === 10) {
+    console.log('-> writeConfigurationApp, data =', data)
+  }
+  
   let configuration = getConfigurationApp()
   const macAddress = getMacAddressFromIp()
   configuration['hostname'] = slugify(env.hostname + '-' + macAddress + '-' + crypto.randomUUID())
@@ -133,6 +177,7 @@ function resetCurrentServer(data) {
     configuration
   })
 }
+*/
 
 try {
   env['nfcStatusOn'] = false
@@ -190,21 +235,10 @@ try {
   const socketHandler = (client) => {
     client_globale = client
 
-    client_globale.on('askConfigurationAppFile', () => {
-      console.log('-> askConfigurationAppFile.')
-      readConfigurationApp()
-    })
-
     client_globale.on('askUpdateConfigurationFile', (data) => {
       // TODO: valider data
-      console.log('-> askUpdateConfigurationFile')
+      console.log('->  askUpdateConfigurationFile')
       writeConfigurationApp(data)
-    })
-
-    client_globale.on('resetCurrentServer', (data) => {
-      // TODO: valider data
-      console.log('-> resetCurrentServer')
-      resetCurrentServer(data)
     })
 
 
@@ -230,15 +264,6 @@ try {
   // lance l'écoute du serveur nfc
   initNfcDevice()
 
-  /* exemple config proxy
-  // TODO: remettre à [] pour la prod
-  PROXY: [
-    {url:"/socket.io", domain: "http://localhost:3000"},
-    {url:"/pin_code/", domain: "https://discovery.filaos.re"},
-    {url:"/wv/", domain: "https://cashless.filaos.re"}
-  ]
-  */
-
   const optionsServer = {
     socketHandler,
     config: {
@@ -246,18 +271,25 @@ try {
       // TODO: remettre en 127.0.0.1 pour la prod
       HOST: env.nfc_server_address,
       // racine du projet = process.cwd()
-      PUBLIQUE: process.cwd()+'/www',
+      PUBLIQUE: process.cwd() + '/www',
       DEBUG: true,
-      PROXY: []
+      PROXY: [
+        { url: "/pin_code/", domain: env.server_pin_code },
+      ]
     }
   }
   const app = new MTE(optionsServer)
+
+  // routes
+  app.addRoute('/config_file', readConfigFile)
+  app.addRoute('/write_config_file', writeConfigFile)
+
   app.listen((host, port) => {
     console.log(`Lancement du serveur à l'adresse : ${port === 443 ? 'https' : 'http'}://${host}:${port}/`)
     console.log(`Single server version ${app.version} (c) filaos974`)
   })
 
- launchWebBrowser(env)
+  startBrowser(env)
 
 } catch (error) {
   console.log('error', error)

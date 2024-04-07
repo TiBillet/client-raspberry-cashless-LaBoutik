@@ -1,7 +1,7 @@
 const vkSpaces = {
   keyMargin: 3,
   forceTypeNumberToText: true,
-  virtualKeybordPath: './assets/virtualKeyboard/',
+  virtualKeybordPath: '/assets/virtualKeyboard/',
   icons: {
     up: 'keyboard_capslock_black_24dp.svg',
     del: 'keyboard_backspace_black_24dp.svg',

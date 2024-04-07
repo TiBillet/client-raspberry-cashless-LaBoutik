@@ -3,8 +3,14 @@ import * as http from 'http'
 import * as httpProxyD from 'http-proxy'
 import * as fs from 'node:fs'
 import { Server } from "socket.io"
+import { env } from '../.env.js'
 
 let fichier = '', contentType = ''
+
+// 1 - affiche messages des appels socket.io et leurs méthodes uniquement
+// 2 - url et méthodes affiliées
+// 10 - tous les logs
+const logLevel = env.logLevel
 
 // ---  proxy ---
 const httpProxy = httpProxyD.default
@@ -64,7 +70,9 @@ export class MTE {
 
       const methode = req.method
       const ip = req.headers['x-forwarded-for'] || req.socket.remoteAddress || null
-      console.log('-> url =', url, '  --  ip =', ip)
+      if (logLevel === 2 || logLevel === 10) {
+        console.log('-> url =', url, '  --  ip =', ip)
+      }
       //console.log('-> methode =', methode, '  --  routes (post) =', this.routes)
 
       //midleware
@@ -73,7 +81,7 @@ export class MTE {
       })
 
       const route = this.routes.find(obj => obj.name === url)
-      // console.log('url =', url, '  --  route =', route)  
+      // console.log('url =',if (logLevel === 2) { url, '  --  route =', route)  
 
       if (methode === 'OPTIONS') {
         res.writeHead(200, headers)
@@ -121,7 +129,9 @@ export class MTE {
           }
 
           const ip = req.connection.remoteAddress
-          console.log('-> fichier :' + fichier)
+          if (logLevel === 2 || logLevel === 10) {
+            console.log('-> fichier :' + fichier)
+          }
 
           if (fs.existsSync(fichier) === true) {
             const contenuFichier = fs.readFileSync(fichier)
@@ -161,7 +171,9 @@ export class MTE {
         }
         this.io = new Server(this.serveur, options)
         this.io.on("connection", this.socketHandler)
-        console.log('Socket.io up')
+        if (logLevel === 1 || logLevel === 10) {
+          console.log('Socket.io up')
+        }
       }
 
     } catch (error) {

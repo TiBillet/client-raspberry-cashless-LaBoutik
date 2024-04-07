@@ -30,7 +30,7 @@
         <button id="step1-bt-annuler" class="action c-blue" type="button" onclick="showStep2()" style="display: none">
           Annuler
         </button>
-        <button class="action c-green" type="button" onclick="getUrlServerFromPinCode()">
+        <button class="action c-green" type="button" onclick="keyboard.hide();getUrlServerFromPinCode()">
           Valider
         </button>
       </div>
@@ -76,6 +76,7 @@
     </div>
   </div>
   <div class="keyboard keyboard-hidden"></div>
+  <script src="assets/js/slugify.js"></script>
   <script src="assets/js/socket_io.js"></script>
   <script type="module" src="assets/js/index.js"></script>
 </body>
