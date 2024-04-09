@@ -38,16 +38,20 @@ export class MTE {
     })
   }
 
-  use(fonction) {
+  use(fonction, options) {
+    console.log('clas use function, type =', typeof (fonction))
     if (typeof fonction !== 'function') {
       throw new Error('Il faut une fonction')
     }
-    this.listFonctions.push(fonction)
+    this.listFonctions.push({ func: fonction, options })
   }
 
   listen(callback) {
     const handler = async (req, res) => {
       let url = req.url, useProxy = false
+
+      const origin = (req.headers.origin === undefined) ? 'http://localhost:3000' : req.headers.origin
+      console.log('url =', req.url, '  --  origin =', origin)
 
       // detecte une url à router en mode proxy
       if (this.config.PROXY.length >= 1) {
@@ -60,13 +64,17 @@ export class MTE {
         }
       }
 
+      let headers = {}
+      /*
       // cors
       const headers = {
-        'Access-Control-Allow-Origin': '*',
-        "Access-Control-Allow-Methods": "GET, PUT, POST, DELETE, OPTIONS",
-        "Access-Control-Allow-Headers": "Content-Type, Authorization, Content-Length, X-Requested-With",
+        'Access-Control-Allow-Origin': "*",
+        "Access-Control-Allow-Methods": "GET, PUT, POST, DELETE, PATCH, OPTIONS",
+        "Access-Control-Allow-Headers": "Access-Control-Allow-Headers, Origin,Accept, X-Requested-With, Content-Type, Access-Control-Request-Method, Access-Control-Request-Headers",
+        "Access-Control-Allow-Credentials": "true",
         "Access-Control-Max-Age": 2592000 // 30 days
       }
+      */
 
       const methode = req.method
       const ip = req.headers['x-forwarded-for'] || req.socket.remoteAddress || null
@@ -75,21 +83,13 @@ export class MTE {
       }
       //console.log('-> methode =', methode, '  --  routes (post) =', this.routes)
 
-      if (methode === 'OPTIONS') {
-        res.writeHead(204, headers)
-        res.end()
-        return
-      }
-
       //midleware
-      this.listFonctions.forEach((fonc) => {
-        fonc.call(this, req, res, headers)
+      this.listFonctions.forEach((foncData) => {
+        console.log('-> call midleware :')
+        foncData.func.call(this, req, res, headers, foncData.options)
       })
 
       const route = this.routes.find(obj => obj.name === url)
-      // console.log('url =',if (logLevel === 2) { url, '  --  route =', route)  
-
-        console.log('--------> methode =', methode);
 
       if (methode === 'POST') {
         // réception des données
@@ -101,14 +101,14 @@ export class MTE {
         req.on("end", () => {
           // recherche dans les routes
           if (route?.name === url && useProxy === false) {
-            route.fonction.call(this, req, res, body)
+            route.fonction.call(this, req, res, body, headers)
           }
         })
       }
 
       if (methode === 'GET') {
         if (route?.name === url && useProxy === false) {
-          route.fonction.call(this, req, res)
+          route.fonction.call(this, req, res, headers)
         }
       }
 
@@ -156,7 +156,6 @@ export class MTE {
           res.end('<h1>' + 'Comment vas-tu ?' + '</h1>')
         }
       }
-
     }
     this.serveur = http.createServer(handler).listen(this.config.PORT, this.config.HOST, callback.call(this, this.config.HOST, this.config.PORT))
 

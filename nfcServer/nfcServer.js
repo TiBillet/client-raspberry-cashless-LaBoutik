@@ -9,6 +9,7 @@ import { env } from './.env.js'
 import * as crypto from 'node:crypto'
 import * as SLUGIFY from 'slugify'
 import * as os from 'node:os'
+import { cors } from './modules/cors.js'
 
 const root = process.cwd()
 const saveFileName = 'configLaboutik.json'
@@ -20,7 +21,6 @@ let retour = null, client_globale, appDeviceEmitter = null
 // 10 - tous les logs
 const logLevel = env.logLevel
 
-/*
 // sentry
 Sentry.init({
   dsn: "https://75f6f3caea6cecf15133aab782274ec4@o262913.ingest.us.sentry.io/4506881173684224",
@@ -33,23 +33,18 @@ Sentry.init({
   profilesSampleRate: 1.0,
 })
 
+/*
 const transaction = Sentry.startTransaction({
   op: "test",
   name: "My First Test Transaction",
 })
 */
 
-const headers = {
-  'Access-Control-Allow-Origin': '*',
-  "Access-Control-Allow-Methods": "GET, PUT, POST, DELETE, OPTIONS",
-  "Access-Control-Allow-Headers": "Content-Type, Authorization, Content-Length, X-Requested-With",
-  "Access-Control-Max-Age": 2592000 // 30 days
-}
 
-
-function readConfigFile(req, res) {
+function readConfigFile(req, res, headers) {
+  console.log('-> readConfigFile, headers =', headers)
   let retour
-  headers["Content-Type"] = "application/json" 
+  headers["Content-Type"] = "application/json"
   const configFromFile = readJson(root + '/' + saveFileName)
   if (configFromFile !== null) {
     retour = JSON.parse(configFromFile)
@@ -66,9 +61,9 @@ function readConfigFile(req, res) {
   res.end()
 }
 
-function writeConfigFile(req, res, rawBody) {
+function writeConfigFile(req, res, rawBody, headers) {
   // console.log('-> writeConfigFile, rawBody =', rawBody)
-  headers["Content-Type"] = "application/json" 
+  headers["Content-Type"] = "application/json"
   try {
     const result = writeJson(root + '/' + saveFileName, rawBody)
     if (result.status === true) {
@@ -87,21 +82,6 @@ function writeConfigFile(req, res, rawBody) {
     res.end()
   }
 }
-
-/*
-function getConfigurationApp() {
-  let retour
-  const configFromFile = readJson(root + '/' + saveFileName)
-  if (configFromFile !== null) {
-    retour = configFromFile
-  } else {
-    retour = env
-  }
-  retour['ip'] = getIp('public', 'ipv4')
-  return retour
-}
-*/
-
 
 function readConfigurationApp() {
   client_globale.emit("returnConfigurationApp", getConfigurationApp())
@@ -132,59 +112,6 @@ function generatePassword(length) {
   return password
 }
 
-/*
-function writeConfigurationApp(data) {
-  if (logLevel === 1 || logLevel === 10) {
-    console.log('-> writeConfigurationApp, data =', data)
-  }
-  
-  let configuration = getConfigurationApp()
-  const macAddress = getMacAddressFromIp()
-  configuration['hostname'] = slugify(env.hostname + '-' + macAddress + '-' + crypto.randomUUID())
-  configuration['uuidDevice'] = macAddress
-  configuration['ip'] = getIp()
-  if (data.pinCode) {
-    configuration['pin_code'] = data.pinCode
-  }
-
-  // serveur inéxistant dans le fichier de conf, ajouter le
-  const testServerIn = findDataServerFromConfiguration(data.retour.server_url, configuration)
-  if (testServerIn === undefined) {
-    const newServer = {
-      server: data.retour.server_url,
-      password: generatePassword(30),
-      locale: data.retour.locale,
-      publicKeyPem: data.retour.server_public_pem
-    }
-    configuration.servers.push(newServer)
-  }
-  configuration.current_server = data.retour.server_url
-  // console.log('configuration =', configuration)
-  const result = writeJson(root + '/' + saveFileName, configuration)
-  console.log('result =', result)
-  client_globale.emit("writeConfigurationAppStatus", {
-    status: result.status,
-    msg: result.msg,
-    askFrom: data.askFrom,
-    configuration
-  })
-}
-
-function resetCurrentServer(data) {
-  console.log('-> resetCurrentServer, data =', data)
-  let configuration = getConfigurationApp()
-  configuration.servers = data.newServers
-  configuration.current_server = ''
-  const result = writeJson(root + '/' + saveFileName, configuration)
-  console.log('result =', result)
-  client_globale.emit("writeConfigurationAppStatus", {
-    status: result.status,
-    msg: result.msg,
-    askFrom: data.askFrom,
-    configuration
-  })
-}
-*/
 
 try {
   env['nfcStatusOn'] = false
@@ -281,12 +208,21 @@ try {
       PUBLIQUE: process.cwd() + '/www',
       DEBUG: true,
       PROXY: [
-        { url: "/pin_code/", domain: env.server_pin_code },
+        { url: "/pin_code/", domain: env.server_pin_code }
       ]
     }
   }
   const app = new MTE(optionsServer)
 
+  // ajout du midleware cors
+  app.use(cors, {
+    origin: '*',
+    headers: 'Sentry-trace, Baggage, Access-Control-Allow-Headers, Origin,Accept, X-Requested-With, Content-Type, Access-Control-Request-Method, Access-Control-Request-Headers',
+    methods: 'GET,HEAD,PUT,PATCH,POST,DELETE',
+    optionsSuccessStatus: 204,
+    maxAge: 2592000,
+    credentials: true
+  })
   // routes
   app.addRoute('/config_file', readConfigFile)
   app.addRoute('/write_config_file', writeConfigFile)
