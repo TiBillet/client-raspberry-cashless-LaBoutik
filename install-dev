@@ -6,6 +6,7 @@ nfc="gpio"
 server_pin_code="https://discovery.filaos.re"
 nfc_server_port=3000
 nfc_server_address="localhost"
+nfc_server_version="2.24.04.11.15.58"
 front_type="FPI"
 
 
@@ -135,7 +136,7 @@ echo '  '\"nfc_server_port\": $nfc_server_port, >> ./nfcServer/.env.js
 echo '  '\"nfc_server_address\": \"$nfc_server_address\", >> ./nfcServer/.env.js
 echo '  '\"exeChromium\": \"chromium-browser\", >> ./nfcServer/.env.js
 echo '  '\"dev\": true, >> ./nfcServer/.env.js
-echo '  '\"version\": \"2.24.04.07.15.57\", >> ./nfcServer/.env.js
+echo '  '\"version\": \"$nfc_server_version\", >> ./nfcServer/.env.js
 echo '  '\"logLevel\": 1, >> ./nfcServer/.env.js
 if [ $nfc = 'gpio' ]
 then
