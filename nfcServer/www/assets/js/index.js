@@ -2,7 +2,7 @@ import { Keyboard } from '../virtualKeyboard/vk.js'
 
 // initialisation
 window.store = {}
-window.keyboard = new Keyboard(45)
+window.keyboard = new Keyboard(90)
 
 let socket = io(location.origin)
 let configuration
@@ -10,7 +10,7 @@ let devicesStatus = [
   { name: 'network', status: 'off', method: 'networkTest' },
   { name: 'nfc', status: 'off', method: 'nfcTest' }
 ]
-let pinCodeLimit = 6, proprioLimit = 3, step = 0
+// let pinCodeLimit = 6, proprioLimit = 3, step = 0
 const urlLogin = 'wv/login_hardware'
 
 function showNoNetwork() {

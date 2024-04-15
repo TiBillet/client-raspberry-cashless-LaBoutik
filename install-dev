@@ -50,7 +50,7 @@ apt-get update
 apt-get install nodejs -y
 
 apt list --installed > log2
-sort log1 log2 | uniq -u > log-install-node20.txt && rm -fr log1 && rm -fr log2
+sort log1 log2 | uniq -u > log-inecho rm -fr /home/sysop/.config/chromium/Default/ >> /etc/xdg/openbox/autostartstall-node20.txt && rm -fr log1 && rm -fr log2
 
 # addon nodejs
 npm install -g node-gyp
@@ -135,7 +135,7 @@ echo '  '\"current_server\": \"\", >> ./nfcServer/.env.js
 echo '  '\"nfc_server_port\": $nfc_server_port, >> ./nfcServer/.env.js
 echo '  '\"nfc_server_address\": \"$nfc_server_address\", >> ./nfcServer/.env.js
 echo '  '\"exeChromium\": \"chromium-browser\", >> ./nfcServer/.env.js
-echo '  '\"dev\": true, >> ./nfcServer/.env.js
+echo '  '\"dev\": false, >> ./nfcServer/.env.js
 echo '  '\"version\": \"$nfc_server_version\", >> ./nfcServer/.env.js
 echo '  '\"logLevel\": 1, >> ./nfcServer/.env.js
 if [ $nfc = 'gpio' ]
@@ -187,7 +187,6 @@ echo 'xset dpms 0 0 0 && xset s noblank  && xset s off' >> /etc/xdg/openbox/auto
 echo  >> /etc/xdg/openbox/autostart
 echo '# vidage du cache chromium' >> /etc/xdg/openbox/autostart
 echo rm -fr /home/sysop/.cache/chromium >> /etc/xdg/openbox/autostart
-echo rm -fr /home/sysop/.config/chromium/Default/ >> /etc/xdg/openbox/autostart
 echo  >> /etc/xdg/openbox/autostart
 echo '# lance le seveur nfc' >> /etc/xdg/openbox/autostart
 echo cd /home/sysop/nfcServer/ >> /etc/xdg/openbox/autostart
