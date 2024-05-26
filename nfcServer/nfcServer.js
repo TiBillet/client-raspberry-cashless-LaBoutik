@@ -2,7 +2,7 @@
 // sudo lsof -nP -iTCP:3000 -sTCP:LISTEN
 
 import { MTE } from './httpServer/index.js'
-import { readJson, writeJson, getIp, createUuidPiFromMacAddress, startBrowser } from './modules/commun.js'
+import { readJson, writeJson, getIp, createUuidPiFromMacAddress, startBrowser, deleteFile } from './modules/commun.js'
 import * as Sentry from '@sentry/node'
 import { ProfilingIntegration } from "@sentry/profiling-node"
 import { env } from './.env.js'
@@ -21,6 +21,7 @@ let retour = null, client_globale, appDeviceEmitter = null
 // 10 - tous les logs
 const logLevel = env.logLevel
 
+/*
 // sentry
 Sentry.init({
   dsn: "https://75f6f3caea6cecf15133aab782274ec4@o262913.ingest.us.sentry.io/4506881173684224",
@@ -33,13 +34,12 @@ Sentry.init({
   profilesSampleRate: 1.0,
 })
 
-/*
+
 const transaction = Sentry.startTransaction({
   op: "test",
   name: "My First Test Transaction",
 })
 */
-
 
 function readConfigFile(req, res, headers) {
   console.log('-> readConfigFile, headers =', headers)
@@ -48,6 +48,14 @@ function readConfigFile(req, res, headers) {
   const configFromFile = readJson(root + '/' + saveFileName)
   if (configFromFile !== null) {
     retour = JSON.parse(configFromFile)
+    // console.log('-----------------------------------------------------');
+    // console.log('retour.server_pin_code =', retour.server_pin_code);
+    // console.log('env.server_pin_code =', env.server_pin_code);
+    // console.log('-----------------------------------------------------');
+    if (retour.server_pin_code !== env.server_pin_code) {
+      retour = env  
+      deleteFile(root + '/' + saveFileName)
+    }
   } else {
     retour = env
   }

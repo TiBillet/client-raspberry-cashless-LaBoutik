@@ -1,6 +1,6 @@
 #!/bin/bash
 nfc="gpio"
-server_pin_code="https://discovery.filaos.re"
+server_pin_code="https://discovery.tibillet.coop"
 nfc_server_port=3000
 nfc_server_address="localhost"
 nfc_server_version="2.24.04.11.15.58"

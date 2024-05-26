@@ -8,6 +8,14 @@ const root = process.cwd()
 const config = readJson(root + "/.env.json")
 const pathLogs = root + "/logs.txt"
 
+export function deleteFile(path) {
+  try {
+    fs.unlinkSync(path)
+  } catch (error) {
+    console.log('-> deleteFile:', error)
+  }
+}
+
 export function memoryStat(unit) {
   const mu = process.memoryUsage().heapUsed
   // # bytes / KB / MB / GB
@@ -50,7 +58,7 @@ export function readJson(path) {
   try {
     const fileExists = fs.existsSync(path)
     if (fileExists) {
-      const rawdata = fs.readFileSync(path)
+      const rawdata = fs.readFileSync(path, { encoding: 'utf8' })
       return JSON.parse(rawdata)
     } else {
       throw new Error("The file doesn't exist")
@@ -63,7 +71,7 @@ export function readJson(path) {
 
 export function writeJson(path, data) {
   try {
-    fs.writeFileSync(path, JSON.stringify(data))
+    fs.writeFileSync(path, JSON.stringify(data), { encoding: 'utf8' })
     return { status: true, msg: '' }
   } catch (error) {
     console.log("sauvegarde fichier de configuration,", error.message)
@@ -108,38 +116,6 @@ export function createUuidPiFromMacAddress() {
   return retour
 }
 
-
-/*
-export function launchBrowser(nameProcess, options) {
-  let msgErreur = "", config, infoNfcServer
-
-  try {
-    config = readJson("./.env.json")
-    urlServerNfc = config.urlServerNfc
-  } catch (err) {
-    msgErreur = err
-  }
-
-  // Lance prog
-  const prog = spawn(nameProcess, options)
-
-  prog.stdout.on("data", (data) => {
-    console.log(`prog - stdout: ${data}`)
-  })
-
-  prog.stderr.on("data", (data) => {
-    console.error(`prog - stderr: ${data}`)
-  })
-
-  prog.on("close", (code) => {
-    console.log(`prog - child process exited with code ${code}`)
-    if (code === 0) {
-      console.log(`--> ${nameProcess} démarrer !`)
-    }
-  })
-}
-*/
-
 export function startBrowser(env) {
   // env.dev = false
   console.log('-> launchWebBrowser, env =', env)
@@ -169,7 +145,7 @@ export function startBrowser(env) {
     console.log('optionsBrowser =', optionsBrowser)
 
     // Lance chromium
-    const demChromium = spawn(env.exeChromium, optionsBrowser, {uid: 1000, gid: 1000})
+    const demChromium = spawn(env.exeChromium, optionsBrowser, { uid: 1000, gid: 1000 })
 
     demChromium.stdout.on("data", (data) => {
       console.log(`chromium - stdout: ${data}`)
