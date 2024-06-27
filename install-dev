@@ -176,7 +176,7 @@ npm i
 
 #TODO: ajouter partie rotation écran
 
-Autologin mode console
+#Autologin mode console
 raspi-config nonint do_boot_behaviour B2
 
 # configuration x11 et démarrage du serveur nfc
