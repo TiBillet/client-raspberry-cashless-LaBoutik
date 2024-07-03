@@ -11,7 +11,7 @@ front_type="$6"
 rotate="$7"
 # Verifier si le nombre d'arguments est correct sinon valeurs par defaut
 if [ "$#" -ne 7 ]; then
-	read -p "Usage: $0 type_nfc server_pin_code nfc_server_port nfc_server_address nfc_server_version front_type
+	read -p "Usage: $0 type_nfc server_pin_code nfc_server_port nfc_server_address nfc_server_version front_type rotate
 	 ---- Vous allez continuer avec les valeurs par defaut (O/n):---- " choix 
 		if [ "$choix" != "O" ] && [ "$choix" != "o" ]; then
 		echo "Arrêt du script."
