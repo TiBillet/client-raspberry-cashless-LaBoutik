@@ -1,0 +1,86 @@
+<!DOCTYPE html>
+
+<head>
+  <meta charset="utf-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1">
+  <link rel="stylesheet" href="assets/virtualKeyboard/vk.css">
+  <link rel="stylesheet" href="assets/css/index.css">
+  <title>Tibillet</title>
+</head>
+
+<body>
+
+  <div id="affichage-alertes" class="BF-col">
+    <img src="assets/images/logo.png" />
+    <!-- si wifi pas activé un message sera affiché -->
+    <!-- si nfc pas activé un message sera affiché -->
+  </div>
+  <div id="entree-des-donnees" class="conteneur BF-col">
+    <img src="assets/images/logo.png" />
+
+    <!-- étape 1 - pas de configuration sauvegardée -->
+    <div id="step-1" class="conteneur BF-col" style="display: none">
+      <div id="field-pin" class="ligne BF-col">
+        <div class="info" for="pin">Code pin :</div>
+        <input type="number" id="pinCode" class="entree keyboard-use"
+          style="font-size: 1.2rem; background-color: #ffffff; color: black" />
+      </div>
+      <div id="retour-pin-code" class="info-danger"></div>
+      <div class="ligne BF-ligne">
+        <button id="step1-bt-annuler" class="action c-blue" type="button" onclick="showStep2()" style="display: none">
+          Annuler
+        </button>
+        <button class="action c-green" type="button" onclick="keyboard.hide();getUrlServerFromPinCode()">
+          Valider
+        </button>
+      </div>
+    </div>
+
+    <!-- étape 2 - configuration sauvegardée, lancerl'application ou réentrer un pin code -->
+    <div id="step-2" class="conteneur BF-col" style="display: none">
+      <div id="info-server" class="info">Serveur cashless :</div>
+      <div class="ligne BF-ligne">
+        <button id="start-app" data-url-server="" class="action c-green" type="button" onclick="startApp()">
+          Lancer l'application
+        </button>
+      </div>
+      <!--
+      <div class="ligne BF-ligne mt-2r">
+        <button class="action c-blue" type="button" onclick="showStep1()">
+          Modifier serveur
+        </button>
+      </div>
+      -->
+      <div class="ligne BF-ligne mt-2r">
+        <button class="action c-danger" type="button" onclick="confirmReset()">
+          Reset
+        </button>
+      </div>
+    </div>
+  </div>
+  <div id="app-log" style="padding: 4px">
+    <div>résolution : <span id="info-resolution-ecran"></span></div>
+    <div>tagId : <span id="tag-id"></span></div>
+  </div>
+  <!-- modal confirm -->
+  <div id="modal-confirm" class="BF-col" style="display: none">
+    <div>
+      <div id="modal-confirm-infos" class="BF-col"></div>
+
+      <div class="ligne BF-ligne mt-2r">
+        <button id="modal-confirm-annuler" class="action c-blue" type="button" onclick="hideModalConfirm()">
+          Annuler
+        </button>
+        <button id="modal-confirm-valider" class="action c-green" type="button">
+          Valider
+        </button>
+      </div>
+    </div>
+  </div>
+  <div class="keyboard keyboard-hidden"></div>
+  <script src="assets/js/slugify.js"></script>
+  <script src="assets/js/socket_io.js"></script>
+  <script type="module" src="assets/js/index.js"></script>
+</body>
+
+</html>
