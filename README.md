@@ -20,7 +20,7 @@ git clone https://github.com/TiBillet/client-raspberry-cashless-LaBoutik
 #go to the repositorie
 cd client-raspberry-cashless-LaBoutik.git
 #permit exec
-chmod +x LaBoutik.sh
+sudo chmod +x LaBoutik.sh
 ```
 run the script
 > Note: Run the script, without parameters, is for an installation hosted by Tibillet with the default settings.
