@@ -1,5 +1,6 @@
 # Creating a LaBoutik terminal from a bash script
 ## Quick Start
+
 Create a  PI OS Legacy 32 bit Lite  via Raspberry Pi Imager
 
 On Raspberry Pi Imager :
@@ -11,22 +12,34 @@ Boot your Pi
 
 Connect it via ssh
 
-Copy LaBoutik.sh to your pi with curl : Don't use git clone .
-
 ```
-curl -O https://raw.githubusercontent.com/TiBillet/client-raspberry-cashless-LaBoutik/main/LaBoutik.sh
-
+#install git on your Pi
+sudo apt-get install git -y
+#git clone this repro
+git clone https://github.com/TiBillet/client-raspberry-cashless-LaBoutik.git
+#go to the repositorie
+cd client-raspberry-cashless-LaBoutik.git
+#permit exec
 chmod +x LaBoutik.sh
-
-sudo ./LaBoutik.sh password token protocole serveur rotate nfc
 ```
-- Password & token ( given from server instance)
-- Protocole : http for local , https for web acces
-- server : server address (without //http*)
-- rotate : 0 -> Normal , 1 -> 90°, 2 -> 180°, 3 -> 270°
-- nfc : if usb reader : usb , if GPIO reader : gpio
+run the script
+> Note: Run the script, without parameters, is for an installation hosted by Tibillet with the default settings.
+> If you have hosted your own server, read more below
+```
+sudo ./LaBoutik.sh 
+```
 
 And take a coffe :)
 
-## Details of operations :
-coming soon ...
+## if tou use your own server :
+run the script like this 
+sudo ./nfc_type server_pin_code nfc_server_port nfc_server_address nfc_server_version front_type rotate
+with :
+nfc_type : gpio or usb
+server_pin_code : Your pin code server adress
+nfc_server_port: by default :3000
+nfc_server_address: by default :localhost
+nfc_server_version: by default(to day) :2.24.04.11.15.58
+front_type:for raspberry :FPI for laptop:
+rotate: 0 -> Normal , 1 -> 90°, 2 -> 180°, 3 -> 270°
+
