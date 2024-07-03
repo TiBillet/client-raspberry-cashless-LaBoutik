@@ -16,7 +16,7 @@ Connect it via ssh
 #install git on your Pi
 sudo apt-get install git -y
 #git clone this repro
-git clone https://github.com/TiBillet/client-raspberry-cashless-LaBoutik.git
+git clone https://github.com/TiBillet/client-raspberry-cashless-LaBoutik
 #go to the repositorie
 cd client-raspberry-cashless-LaBoutik.git
 #permit exec
