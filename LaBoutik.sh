@@ -253,5 +253,5 @@ echo node nfcServer.js  >> /etc/xdg/openbox/autostart
 chown root:root /etc/xdg/openbox/autostart
 chmod 755 /etc/xdg/openbox/autostart
 
-
+echo "-----Fin du script, Reboot"
 reboot
