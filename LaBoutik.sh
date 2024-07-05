@@ -178,8 +178,10 @@ JSON_STRING='{
 "type":"module",
 "license": "ISC",
 "dependencies":{
-  "ip": "^1.1.8","socket.io": "^4.7.2",
-  "@sentry/node": "^7.106.0","@sentry/profiling-node": "^7.106.0",
+  "local-ipv4-address":"^0.0.2",
+  "socket.io": "^4.7.2",
+  "@sentry/node": "^7.106.0",
+  "@sentry/profiling-node": "^7.106.0",
   "slugify": "^1.6.6",
   "http-proxy": "^1.18.1",'
 
