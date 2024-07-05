@@ -100,7 +100,7 @@ export class MTE {
 
         req.on("end", () => {
           // recherche dans les routes
-          if (route?.name === url && useProxy === false) {
+          if (route.name === url && useProxy === false) {
             route.fonction.call(this, req, res, body, headers)
           }
         })

@@ -1,9 +1,10 @@
 import * as fs from "node:fs"
-import * as IP from "ip"
+import * as LOCALIP from "local-ip-url"
 import { spawn } from "child_process"
 import * as process from "node:process"
 import * as os from 'node:os'
 
+const localIpUrl = LOCALIP.default
 const root = process.cwd()
 const config = readJson(root + "/.env.json")
 const pathLogs = root + "/logs.txt"
@@ -88,9 +89,9 @@ export function getInfosServerNfc(url) {
   }
 }
 
-export function getIp(typeReseau, famille) {
+export function getIp() {
   try {
-    const ip = IP.default.address(typeReseau, famille)
+    const ip = localIpUrl()
     if (ip !== "127.0.0.1" && ip !== "0.0.0.0") {
       return ip
     } else {
@@ -104,7 +105,7 @@ export function getIp(typeReseau, famille) {
 
 export function createUuidPiFromMacAddress() {
   const obj = os.networkInterfaces()
-  const ip = getIp('public', 'ipv4')
+  const ip = getIp()
   let retour = 'xxxxxxxxxxxx'
   for (let [key, value] of Object.entries(obj)) {
     const result = value.find(item => item.address === ip)

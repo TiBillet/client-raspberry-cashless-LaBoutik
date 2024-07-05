@@ -1,5 +1,6 @@
 // sudo apt install -y lsof
 // sudo lsof -nP -iTCP:3000 -sTCP:LISTEN
+// test 2
 
 import { MTE } from './httpServer/index.js'
 import { readJson, writeJson, getIp, createUuidPiFromMacAddress, startBrowser, deleteFile } from './modules/commun.js'
@@ -60,7 +61,7 @@ function readConfigFile(req, res, headers) {
     retour = env
   }
   retour['piDevice'] = {
-    ip: getIp('public', 'ipv4'),
+    ip: getIp(),
     uuid: createUuidPiFromMacAddress(),
     hostname: os.hostname()
   }
