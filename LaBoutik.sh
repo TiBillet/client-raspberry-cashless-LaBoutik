@@ -68,7 +68,7 @@ NODE_MAJOR=20
 echo "deb [signed-by=/usr/share/keyrings/nodesource.gpg] https://deb.nodesource.com/node_$NODE_MAJOR.x nodistro main" | sudo tee /etc/apt/sources.list.d/nodesource.list
 apt-get update
 apt-get install nodejs -y
-
+apt-get install npm -y
 apt list --installed > log2
 sort log1 log2 | uniq -u > log-inecho rm -fr /home/sysop/.config/chromium/Default/ >> /etc/xdg/openbox/autostartstall-node20.txt && rm -fr log1 && rm -fr log2
 
