@@ -34,7 +34,7 @@ And take a coffe :)
 ## if you use your own server :
 run the script like this
 
-sudo ./nfc_type server_pin_code nfc_server_port nfc_server_address nfc_server_version front_type rotate
+sudo ./LaBoutik.sh nfc_type <> server_pin_code <> nfc_server_port <> nfc_server_address <> nfc_server_version <> front_type rotate
 
 with :
 nfc_type : gpio or usb
