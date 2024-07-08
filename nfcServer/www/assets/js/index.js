@@ -287,12 +287,15 @@ window.startApp = async function () {
   window.location = configuration.current_server + urlLogin
 }
 
-
 socket.on('tagIdChange', (retour) => {
   document.querySelector('#tag-id').innerHTML = retour
   // console.log('-> msg "tagIdChange", retour =', retour)
 })
 
+socket.on('returnIp', (retour) => {
+  document.querySelector('#ip').innerHTML = retour
+  // console.log('-> msg "returnIp", retour =', retour)
+})
 
 document.addEventListener('DOMContentLoaded', async function () {
 

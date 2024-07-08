@@ -199,6 +199,11 @@ try {
       retour = null
     })
 
+    client_globale.on('requestedIp', () => {
+      console.log('-> msg "requestedIp" !')
+      client_globale.emit('returnIp', getIp())
+    })
+
     client_globale.on("disconnect", () => {
       console.log("Client déconnecté !!")
     })
