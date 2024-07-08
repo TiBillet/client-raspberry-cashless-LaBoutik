@@ -12,8 +12,8 @@ rotate="$7"
 # Verifier si le nombre d'arguments est correct sinon valeurs par defaut
 if [ "$#" -ne 7 ]; then
 	read -p "Usage: $0 type_nfc server_pin_code nfc_server_port nfc_server_address nfc_server_version front_type rotate
-	 ---- Vous allez continuer avec les valeurs par defaut (O/n):---- " choix 
-		if [ "$choix" != "O" ] && [ "$choix" != "o" ]; then
+	 ---- Vous allez continuer avec les valeurs par defaut (y/n):---- " choix 
+		if [ "$choix" != "Y" ] && [ "$choix" != "y" ]; then
 		echo "Arrêt du script."
 		exit 1
 		elif [ "$choix" != "N" ] && [ "$choix" != "n" ]; then
@@ -68,7 +68,7 @@ NODE_MAJOR=20
 echo "deb [signed-by=/usr/share/keyrings/nodesource.gpg] https://deb.nodesource.com/node_$NODE_MAJOR.x nodistro main" | sudo tee /etc/apt/sources.list.d/nodesource.list
 apt-get update
 apt-get install nodejs -y
-apt-get install npm -y
+#apt-get install npm -y
 apt list --installed > log2
 sort log1 log2 | uniq -u > log-inecho rm -fr /home/sysop/.config/chromium/Default/ >> /etc/xdg/openbox/autostartstall-node20.txt && rm -fr log1 && rm -fr log2
 
@@ -204,19 +204,37 @@ npm i
 #TODO: simplifier sans rappatrier tous les drivers
 #Config Ecran
 ##Création du dossier repos "LCD-show"
-if [ ! -d /home/sysop/client-raspberry-cashless-LaBoutik/LCD-show ] ; then 
+#if [ ! -d /home/sysop/client-raspberry-cashless-LaBoutik/LCD-show ] ; then 
     #mkdir /home/sysop/LCD-show
-    git clone https://github.com/goodtft/LCD-show.git
-    chown -R sysop:sysop /home/sysop/client-raspberry-cashless-LaBoutik/LCD-show
-    chmod 0775 /home/sysop/client-raspberry-cashless-LaBoutik/LCD-show
-    sed -i "s|^sudo reboot$|# remove sudo reboot|" "/home/sysop/client-raspberry-cashless-LaBoutik/LCD-show/LCD7C-show" 
-    sed -i "s|^echo \"reboot now\"$|# remove reboot now|" "/home/sysop/client-raspberry-cashless-LaBoutik/LCD-show/LCD7C-show" 
-    chmod +x /home/sysop/client-raspberry-cashless-LaBoutik/LCD-show/LCD7C-show 
-    cd /home/sysop/client-raspberry-cashless-LaBoutik/LCD-show
-    ./LCD7C-show   | tee -a installation.log
-    echo "hdmi:capacity:7C-1024x600:0:1024:600" > /root/.have_installed 
-fi
+#    git clone https://github.com/goodtft/LCD-show.git
+#    chown -R sysop:sysop /home/sysop/client-raspberry-cashless-LaBoutik/LCD-show
+#    chmod 0775 /home/sysop/client-raspberry-cashless-LaBoutik/LCD-show
+#    sed -i "s|^sudo reboot$|# remove sudo reboot|" "/home/sysop/client-raspberry-cashless-LaBoutik/LCD-show/LCD7C-show" 
+#    sed -i "s|^echo \"reboot now\"$|# remove reboot now|" "/home/sysop/client-raspberry-cashless-LaBoutik/LCD-show/LCD7C-show" 
+#    chmod +x /home/sysop/client-raspberry-cashless-LaBoutik/LCD-show/LCD7C-show 
+#    cd /home/sysop/client-raspberry-cashless-LaBoutik/LCD-show
+#    ./LCD7C-show   | tee -a installation.log
+#    echo "hdmi:capacity:7C-1024x600:0:1024:600" > /root/.have_installed 
+#fi
+echo "Config ecran"
+sudo cp -rf /home/sysop/client-raspberry-cashless-LaBoutik/src/99-fbturbo.conf /usr/share/X11/xorg.conf.d/99-fbturbo.conf
+sudo cp /home/sysop/client-raspberry-cashless-LaBoutik/src/40-libinput.conf /etc/X11/xorg.conf.d/40-libinput.conf
+  if grep -qE "^dtoverlay=vc4-kms-v3d" "/boot/config.txt"; then
+  sed -i "s|^dtoverlay=vc4-kms-v3d|#dtoverlay=vc4-kms-v3d|" "/boot/config.txt"
+  fi
+params=("hdmi_force_hotplug=1" "dtparam=i2c_arm=on" "dtparam=spi=on" "enable_uart=1" "display_rotate="$rotate "max_usb_current=1"  "config_hdmi_boost=7" "hdmi_group=2" "hdmi_mode=87" "hdmi_drive=1" "hdmi_cvt 1024 600 60 6 0 0 0")
 
+for element in "${params[@]}"; do
+  # V      rifier si le param      tre n'existe pas dans le fichier, en excluant les lignes comment      es
+  if ! grep -qE "^[^#]*\b${element%=*}=" "/boot/config.txt"; then
+    echo "$element" >> "/boot/config.txt"
+  else
+    sed -i "s|^[^#]*\b${element%=*}=.*|$element|" "/boot/config.txt"
+  fi
+done
+
+
+##############
 if [ "$rotate" -eq 0 ]; then
     sed -i '/Option "CalibrationMatrix"/c        Option "CalibrationMatrix" "1 0 0 0 1 0 0 0 1"' /etc/X11/xorg.conf.d/40-libinput.conf
 elif [ "$rotate" -eq 1 ]; then
@@ -225,16 +243,11 @@ elif [ "$rotate" -eq 2 ]; then
     sed -i '/Option "CalibrationMatrix"/c        Option "CalibrationMatrix" "-1 0 1 0 -1 1 0 0 1"' /etc/X11/xorg.conf.d/40-libinput.conf
 elif [ "$rotate" -eq 3 ]; then
     sed -i '/Option "CalibrationMatrix"/c        Option "CalibrationMatrix" "0 -1 1 1 0 0 0 0 1"' /etc/X11/xorg.conf.d/40-libinput.conf
-
 fi
 
-echo "----- Configuration de config.txt"
+#echo "----- Configuration de config.txt"
 # Configuration de config.txt
-echo "display_rotate=$rotate" >> /boot/config.txt
-####
-
-
-
+#echo "display_rotate=$rotate" >> /boot/config.txt
 
 #Autologin mode console
 raspi-config nonint do_boot_behaviour B2

@@ -31,15 +31,23 @@ sudo ./LaBoutik.sh
 
 And take a coffe :)
 
-## if tou use your own server :
-run the script like this 
+## if you use your own server :
+run the script like this
+
 sudo ./nfc_type server_pin_code nfc_server_port nfc_server_address nfc_server_version front_type rotate
+
 with :
 nfc_type : gpio or usb
+
 server_pin_code : Your pin code server adress
+
 nfc_server_port: by default :3000
+
 nfc_server_address: by default :localhost
+
 nfc_server_version: by default(to day) :2.24.04.11.15.58
-front_type:for raspberry :FPI for laptop:
+
+front_type:for raspberry : FPI for laptop: FPO
+
 rotate: 0 -> Normal , 1 -> 90°, 2 -> 180°, 3 -> 270°
 
