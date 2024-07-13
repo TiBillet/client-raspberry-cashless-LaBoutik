@@ -1,7 +1,6 @@
 #!/bin/bash
-#git clone --branch sans_user_agent --single-branch https://github.com/TiBillet/client-raspberry-cashless-LaBoutik.git
 set -e
-#TODO: pour le script final remplacer par $x
+ 
 nfc="$1"
 server_pin_code="$2"
 nfc_server_port="$3"
@@ -37,18 +36,6 @@ apt-get update && sudo apt-get -y upgrade
 # install divers
 apt list --installed > log1
 
-#echo "----- install 7Zip"
-#apt-get install p7zip-full -y
-#echo "----- install git" -y
-#apt-get install git -yS
-#echo "----- install nano"
-#apt-get install nano -y
-
-#apt list --installed > log2
-#sort log1 log2 | uniq -u > log-install-divers.txt && rm -fr log1 && rm -fr log2
-
-# TODO: rapatrier le git "sans_user_agent"
-
 
 # install node 20.xx
 apt list --installed > log1
@@ -68,7 +55,6 @@ NODE_MAJOR=20
 echo "deb [signed-by=/usr/share/keyrings/nodesource.gpg] https://deb.nodesource.com/node_$NODE_MAJOR.x nodistro main" | sudo tee /etc/apt/sources.list.d/nodesource.list
 apt-get update
 apt-get install nodejs -y
-#apt-get install npm -y
 apt list --installed > log2
 sort log1 log2 | uniq -u > log-inecho rm -fr /home/sysop/.config/chromium/Default/ >> /etc/xdg/openbox/autostartstall-node20.txt && rm -fr log1 && rm -fr log2
 
@@ -85,8 +71,15 @@ echo "----- install x11"
 apt-get install x11-xserver-utils -y
 echo "----- install xinit"
 apt-get install xinit -y
-echo "----- install fbturbo"
-apt-get install xserver-xorg-video-fbturbo -y
+
+if ! grep -q "Pi 4 Model" /proc/cpuinfo; then
+  echo "ce n'est pas un Pi4"
+  echo "----- install fbturbo"
+  apt-get install xserver-xorg-video-fbturbo -y
+else
+  echo "C un PI4"
+fi
+
 echo "----- install xdtool"
 apt-get install xdotool -y
 echo "----- install openbox"
@@ -104,8 +97,8 @@ apt-get install chromium-browser -y
 apt list --installed > log2
 sort log1 log2 | uniq -u > log-install-chromium.txt && rm -fr log1 && rm -fr log2
 
-
 # config startx
+echo "----- config startx"
 if grep "#modif bashrc = ok" /home/sysop/.bashrc > /dev/null
 then
  echo 'bashrc déjà modifié pour auto startx !'
@@ -116,6 +109,7 @@ else
 fi
 
 # nfc usb et gpio
+echo "----- config lecteur nfc"
 if [ $nfc = 'gpio' ]
 then
   # gpio
@@ -128,13 +122,13 @@ then
   rm -fr /etc/modprobe.d/blacklist-nfc-usb.conf
 else
   # usb
-  echo "install libpcsclite1"
+  echo "----- install libpcsclite1"
   apt-get install libpcsclite1 -y
-  echo "install libpcsclite-dev"
+  echo "----- install libpcsclite-dev"
   apt-get install libpcsclite-dev -y
-  echo "install pcscd"
+  echo "----- install pcscd"
   apt-get install pcscd -y
-  echo "install pcsc-tools"
+  echo "----- install pcsc-tools"
   apt-get install pcsc-tools -y
   # configuration
   echo "install nfc /bin/false" > /etc/modprobe.d/blacklist-nfc-usb.conf
@@ -198,24 +192,10 @@ echo "${JSON_STRING}" > ./nfcServer/package.json
 echo "${JSON_STRING2}" >> ./nfcServer/package.json
 
 # installation of nfc server modules
+echo "----- install nfcServer"
 cd nfcServer
 npm i
 
-#TODO: simplifier sans rappatrier tous les drivers
-#Config Ecran
-##Création du dossier repos "LCD-show"
-#if [ ! -d /home/sysop/client-raspberry-cashless-LaBoutik/LCD-show ] ; then 
-    #mkdir /home/sysop/LCD-show
-#    git clone https://github.com/goodtft/LCD-show.git
-#    chown -R sysop:sysop /home/sysop/client-raspberry-cashless-LaBoutik/LCD-show
-#    chmod 0775 /home/sysop/client-raspberry-cashless-LaBoutik/LCD-show
-#    sed -i "s|^sudo reboot$|# remove sudo reboot|" "/home/sysop/client-raspberry-cashless-LaBoutik/LCD-show/LCD7C-show" 
-#    sed -i "s|^echo \"reboot now\"$|# remove reboot now|" "/home/sysop/client-raspberry-cashless-LaBoutik/LCD-show/LCD7C-show" 
-#    chmod +x /home/sysop/client-raspberry-cashless-LaBoutik/LCD-show/LCD7C-show 
-#    cd /home/sysop/client-raspberry-cashless-LaBoutik/LCD-show
-#    ./LCD7C-show   | tee -a installation.log
-#    echo "hdmi:capacity:7C-1024x600:0:1024:600" > /root/.have_installed 
-#fi
 echo "Config ecran"
 sudo cp -rf /home/sysop/client-raspberry-cashless-LaBoutik/src/99-fbturbo.conf /usr/share/X11/xorg.conf.d/99-fbturbo.conf
 sudo cp /home/sysop/client-raspberry-cashless-LaBoutik/src/40-libinput.conf /etc/X11/xorg.conf.d/40-libinput.conf
@@ -225,14 +205,12 @@ sudo cp /home/sysop/client-raspberry-cashless-LaBoutik/src/40-libinput.conf /etc
 params=("hdmi_force_hotplug=1" "dtparam=i2c_arm=on" "dtparam=spi=on" "enable_uart=1" "display_rotate="$rotate "max_usb_current=1"  "config_hdmi_boost=7" "hdmi_group=2" "hdmi_mode=87" "hdmi_drive=1" "hdmi_cvt 1024 600 60 6 0 0 0")
 
 for element in "${params[@]}"; do
-  # V      rifier si le param      tre n'existe pas dans le fichier, en excluant les lignes comment      es
   if ! grep -qE "^[^#]*\b${element%=*}=" "/boot/config.txt"; then
     echo "$element" >> "/boot/config.txt"
   else
     sed -i "s|^[^#]*\b${element%=*}=.*|$element|" "/boot/config.txt"
   fi
 done
-
 
 ##############
 if [ "$rotate" -eq 0 ]; then
@@ -245,15 +223,12 @@ elif [ "$rotate" -eq 3 ]; then
     sed -i '/Option "CalibrationMatrix"/c        Option "CalibrationMatrix" "0 -1 1 1 0 0 0 0 1"' /etc/X11/xorg.conf.d/40-libinput.conf
 fi
 
-#echo "----- Configuration de config.txt"
-# Configuration de config.txt
-#echo "display_rotate=$rotate" >> /boot/config.txt
 
 #Autologin mode console
 raspi-config nonint do_boot_behaviour B2
 
 # configuration x11 et demarrage du serveur nfc
-
+echo "----- configuration x11 et demarrage du serveur nfc"
 echo  > /etc/xdg/openbox/autostart
 echo '# stop veille/économie dénergie' >> /etc/xdg/openbox/autostart
 echo 'xset dpms 0 0 0 && xset s noblank  && xset s off' >> /etc/xdg/openbox/autostart
@@ -267,6 +242,12 @@ echo node nfcServer.js  >> /etc/xdg/openbox/autostart
 
 chown root:root /etc/xdg/openbox/autostart
 chmod 755 /etc/xdg/openbox/autostart
+
+if grep -q "Pi 4 Model" /proc/cpuinfo; then
+  echo "C un Pi4"
+  echo "----- sudo rm /usr/share/X11/xorg.conf.d/*.*"
+  sudo rm /usr/share/X11/xorg.conf.d/*.*
+fi
 
 echo "-----Fin du script, Reboot"
 reboot
