@@ -216,7 +216,7 @@ done
 if [ "$rotate" -eq 0 ]; then
     sed -i '/Option "CalibrationMatrix"/c        Option "CalibrationMatrix" "1 0 0 0 1 0 0 0 1"' /etc/X11/xorg.conf.d/40-libinput.conf
 elif [ "$rotate" -eq 1 ]; then
-    sed -i '/Option "CalibrationMatrix"/c        Option "CalibrationMatrix" "0 1 0 0 -1 1 0 0 1"' /etc/X11/xorg.conf.d/40-libinput.conf
+    sed -i '/Option "CalibrationMatrix"/c        Option "CalibrationMatrix" "0 1 0 -1 0 1 0 0 1"' /etc/X11/xorg.conf.d/40-libinput.conf
 elif [ "$rotate" -eq 2 ]; then
     sed -i '/Option "CalibrationMatrix"/c        Option "CalibrationMatrix" "-1 0 1 0 -1 1 0 0 1"' /etc/X11/xorg.conf.d/40-libinput.conf
 elif [ "$rotate" -eq 3 ]; then
