@@ -1,6 +1,5 @@
 import { typeMime } from './typeMine.js'
 import * as http from 'http'
-import * as httpProxyD from 'http-proxy'
 import * as fs from 'node:fs'
 import { Server } from "socket.io"
 import { env } from '../.env.js'
@@ -11,13 +10,6 @@ let fichier = '', contentType = ''
 // 2 - url et méthodes affiliées
 // 10 - tous les logs
 const logLevel = env.logLevel
-
-// ---  proxy ---
-const httpProxy = httpProxyD.default
-const proxy = httpProxy.createProxyServer({})
-proxy.on('error', function (e) {
-  console.log('-> proxy, error', e)
-})
 
 // --- serveur http/https ---
 export class MTE {
@@ -51,30 +43,9 @@ export class MTE {
       let url = req.url, useProxy = false
 
       const origin = (req.headers.origin === undefined) ? 'http://localhost:3000' : req.headers.origin
-      console.log('url =', req.url, '  --  origin =', origin)
-
-      // detecte une url à router en mode proxy
-      if (this.config.PROXY.length >= 1) {
-        for (let p = 0; p < this.config.PROXY.length; p++) {
-          if (url.includes(this.config.PROXY[p].url)) {
-            proxy.web(req, res, { target: this.config.PROXY[p].domain })
-            useProxy = true
-            break
-          }
-        }
-      }
+      // console.log('url =', req.url, '  --  origin =', origin)
 
       let headers = {}
-      /*
-      // cors
-      const headers = {
-        'Access-Control-Allow-Origin': "*",
-        "Access-Control-Allow-Methods": "GET, PUT, POST, DELETE, PATCH, OPTIONS",
-        "Access-Control-Allow-Headers": "Access-Control-Allow-Headers, Origin,Accept, X-Requested-With, Content-Type, Access-Control-Request-Method, Access-Control-Request-Headers",
-        "Access-Control-Allow-Credentials": "true",
-        "Access-Control-Max-Age": 2592000 // 30 days
-      }
-      */
 
       const methode = req.method
       const ip = req.headers['x-forwarded-for'] || req.socket.remoteAddress || null

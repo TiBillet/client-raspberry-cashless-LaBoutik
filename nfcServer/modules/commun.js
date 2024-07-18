@@ -76,7 +76,7 @@ export function writeJson(path, data) {
     return { status: true, msg: '' }
   } catch (error) {
     console.log("sauvegarde fichier de configuration,", error.message)
-    return { status: false, msg: 'error.message' }
+    return { status: false, msg: error.message }
   }
 }
 
@@ -119,7 +119,7 @@ export function createUuidPiFromMacAddress() {
 
 export function startBrowser(env) {
   // env.dev = false
-  console.log('-> launchWebBrowser, env =', env)
+  // console.log('-> launchWebBrowser, env =', env)
   let optionsBrowser
   try {
     // dev
@@ -143,7 +143,7 @@ export function startBrowser(env) {
       optionsBrowser.push("--kiosk")
     }
 
-    console.log('optionsBrowser =', optionsBrowser)
+    // console.log('optionsBrowser =', optionsBrowser)
 
     // Lance chromium
     const demChromium = spawn(env.exeChromium, optionsBrowser, { uid: 1000, gid: 1000 })

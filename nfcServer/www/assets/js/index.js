@@ -91,7 +91,7 @@ async function readFromFile() {
 }
 
 async function writeToFile(configuration) {
-  // console.log('-> writeToFile, configuration =', writeToFile)
+  // console.log('-> writeToFile, configuration =', configuration)
   try {
     const response = await fetch('/write_config_file', {
       mode: 'cors',
@@ -99,6 +99,9 @@ async function writeToFile(configuration) {
       body: JSON.stringify(configuration)
     })
     const retour = await response.json()
+    if(retour.status === false) {
+        console.log('writeToFile,', retour.msg)    
+    }
     return retour.status
   } catch (error) {
     console.log('writeToFile,', error)
@@ -190,7 +193,6 @@ async function updateConfigurationFile(options) {
 
   configuration.current_server = options.retour.server_url
   return await writeToFile(configuration)
-
 }
 
 /**
@@ -230,9 +232,12 @@ window.getUrlServerFromPinCode = async function () {
       data.append('hostname', hostname)
       data.append('username', username)
       const response = await fetch(configuration.server_pin_code + '/pin_code/', {
-        mode: 'cors',
+        mode: 'cors',                         
         method: 'POST',
-        body: data
+        body: data,
+        headers: {
+            "Content-Type" : "application/x-www-form-urlencoded"
+        }
       })
       const retour = await response.json()
       // console.log('-> getUrlServerFromPinCode, retour =', retour)

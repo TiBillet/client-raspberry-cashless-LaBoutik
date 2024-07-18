@@ -43,7 +43,7 @@ const transaction = Sentry.startTransaction({
 */
 
 function readConfigFile(req, res, headers) {
-  console.log('-> readConfigFile, headers =', headers)
+  // console.log('-> readConfigFile, headers =', headers)
   let retour
   headers["Content-Type"] = "application/json"
   const configFromFile = readJson(root + '/' + saveFileName)
@@ -220,10 +220,7 @@ try {
       HOST: env.nfc_server_address,
       // racine du projet = process.cwd()
       PUBLIQUE: process.cwd() + '/www',
-      DEBUG: true,
-      PROXY: [
-        { url: "/pin_code/", domain: env.server_pin_code }
-      ]
+      DEBUG: true
     }
   }
   const app = new MTE(optionsServer)

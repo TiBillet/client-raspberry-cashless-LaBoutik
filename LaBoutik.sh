@@ -243,6 +243,9 @@ echo node nfcServer.js  >> /etc/xdg/openbox/autostart
 chown root:root /etc/xdg/openbox/autostart
 chmod 755 /etc/xdg/openbox/autostart
 
+# nfcServer owner
+chown sysop:sysop /home/sysop/client-raspberry-cashless-LaBoutik/nfcServer
+
 if grep -q "Pi 4 Model" /proc/cpuinfo; then
   echo "C un Pi4"
   echo "----- sudo rm /usr/share/X11/xorg.conf.d/*.*"
