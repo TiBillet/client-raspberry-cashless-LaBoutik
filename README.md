@@ -51,3 +51,7 @@ front_type:for raspberry : FPI for laptop: FPO
 
 rotate: 0 -> Normal , 1 -> 90°, 2 -> 180°, 3 -> 270°
 
+## Troubleshooting :
+#### After "sudo apt-get install git -y" I have return "E: Unable to fetch some archives, maybe run apt-get update or try with --fix-missing?"
+Make sudo apt-get update and try again
+
