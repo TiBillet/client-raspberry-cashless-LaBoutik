@@ -1,4 +1,5 @@
 import { Keyboard } from '../virtualKeyboard/vk.js'
+// branche multiServeur
 
 // initialisation
 window.store = {}
