@@ -1,11 +1,5 @@
-// sudo apt install -y lsof
-// sudo lsof -nP -iTCP:3000 -sTCP:LISTEN
-// test 2
-
 import { MTE } from './httpServer/index.js'
-import { readJson, writeJson, getIp, createUuidPiFromMacAddress, startBrowser, deleteFile } from './modules/commun.js'
-import * as Sentry from '@sentry/node'
-import { ProfilingIntegration } from "@sentry/profiling-node"
+import { readJson, writeJson, getModelPi, getIp, createUuidPiFromMacAddress, startBrowser, deleteFile } from './modules/commun.js'
 import { env } from './.env.js'
 import * as crypto from 'node:crypto'
 import * as SLUGIFY from 'slugify'
@@ -15,33 +9,93 @@ import { cors } from './modules/cors.js'
 const root = process.cwd()
 const saveFileName = 'configLaboutik.json'
 const slugify = SLUGIFY.default
-let retour = null, client_globale, appDeviceEmitter = null
+let retour = null, client_globale = null, appDeviceEmitter = null
+let devices = null
 
 // 1 - affiche messages des appels socket.io et leurs méthodes uniquement
 // 2 - url et méthodes affiliées
 // 10 - tous les logs
 const logLevel = env.logLevel
 
+// infos pi
+const devicePi = {
+    ip: getIp(),
+    model: await getModelPi(),
+    uuid: createUuidPiFromMacAddress(),
+    manufacturer: 'Raspberry Pi',
+    hostname: os.hostname(),
+}
+
+// reset initial devices status
+function resetDevicesStatus() {
+  devices = [
+    { name: 'network', status: 'off' },
+    { name: 'nfc', status: 'off' },
+  ]
+  // status devices
+  if (devicePi.ip !== '127.0.0.1') {
+    let network = devices.find(device => device.name === 'network')
+    network.status = 'on'
+  }
+  // dev test network off
+  // devices.find(device => device.name === 'network').status = 'off'
+}
+
+function recordNfcStatusOn() {
+  let nfcDevice = devices.find(device => device.name === 'nfc')
+  // attention le lecteur nfc a un redémarrage cyclique, on teste uniquement le bon fonctionnement du nfc
+  if (nfcDevice.status === 'off') {
+    console.log('-> emit "returnDevicesStatus"');
+    nfcDevice.status = 'on'
+    client_globale.emit('returnDevicesStatus', { devicesStatus: devices, devicePi })
+  }
+}
+
+// --- load and listen nfc device ---
+function manageTagId(tagId) {
+  // n'emmet que  si une connexion existe
+  if (client_globale !== undefined) {
+    if (retour !== null) {
+      retour["tagId"] = tagId.toUpperCase()
+      client_globale.emit("envoieTagId", retour)
+      console.log("--> demande carte, envoi tag id = " + tagId.toUpperCase())
+      retour = null
+    } else {
+      client_globale.emit("tagIdChange", tagId)
+    }
+  }
+  console.log("tagId =", tagId, "  --  retour =", retour)
+}
+
+function showNfcMsg(msg) {
+  console.log("msg =", msg)
+}
+
+function initNfcDevice() {
+  console.log('')
+  try {
+    const pathDevice = root + '/modules/devices/' + env.device + '.js'
+    if (appDeviceEmitter !== null) {
+      appDeviceEmitter.removeListener("nfcReaderTagId", manageTagId)
+      appDeviceEmitter.removeListener("nfcReader", showNfcMsg)
+      appDeviceEmitter.removeListener("nfcReaderOn", recordNfcStatusOn)
+      appDeviceEmitter.removeListener("nfcReaderReStart", initNfcDevice)
+    }
+    import(pathDevice).then(module => {
+      const { deviceEmitter } = module
+      appDeviceEmitter = deviceEmitter
+      // --- nfc écoutes ---
+      appDeviceEmitter.addListener("nfcReaderTagId", manageTagId)
+      appDeviceEmitter.addListener("nfcReader", showNfcMsg)
+      appDeviceEmitter.addListener("nfcReaderOn", recordNfcStatusOn)
+      appDeviceEmitter.addListener("nfcReaderReStart", initNfcDevice)
+    })
+  } catch (error) {
+    console.log('-> initNfcDevice,', error)
+  }
+}
+
 /*
-// sentry
-Sentry.init({
-  dsn: "https://75f6f3caea6cecf15133aab782274ec4@o262913.ingest.us.sentry.io/4506881173684224",
-  integrations: [
-    new ProfilingIntegration(),
-  ],
-  // Performance Monitoring
-  tracesSampleRate: 1.0, //  Capture 100% of the transactions
-  // Set sampling rate for profiling - this is relative to tracesSampleRate
-  profilesSampleRate: 1.0,
-})
-
-
-const transaction = Sentry.startTransaction({
-  op: "test",
-  name: "My First Test Transaction",
-})
-*/
-
 function readConfigFile(req, res, headers) {
   // console.log('-> readConfigFile, headers =', headers)
   let retour
@@ -96,16 +150,21 @@ function readConfigurationApp() {
   client_globale.emit("returnConfigurationApp", getConfigurationApp())
 }
 
-/**
- * Find specific server in configuration
- * @param {string} urlServer - server to find 
- * @param {object} configuration - app configuration 
- * @returns {undefined|object}
- */
+
+// Find specific server in configuration
+// @param {string} urlServer - server to find 
+ //@param {object} configuration - app configuration 
+ // @returns {undefined|object}
+ //
 function findDataServerFromConfiguration(urlServer, configuration) {
   if (urlServer === undefined) {
     return undefined
   }
+function generatePassword(length) {
+  const chars = "0123456789abcdefghijklmnopqrstuvwxyz!@#$%^&*()ABCDEFGHIJKLMNOPQRSTUVWXYZ"
+  let password = ""
+  const array = new Uint32Array(length)
+  crypto.getRandomValues(a
   return configuration.servers.find(item => item.server === urlServer)
 }
 
@@ -120,64 +179,19 @@ function generatePassword(length) {
   }
   return password
 }
+*/
 
-
+// encapsulate all errors
 try {
-  env['nfcStatusOn'] = false
-
-  // --- load and listen nfc device ---
-  function manageTagId(tagId) {
-    // n'emmet que  si une connexion existe
-    if (client_globale !== undefined) {
-      if (retour !== null) {
-        retour["tagId"] = tagId.toUpperCase()
-        client_globale.emit("envoieTagId", retour)
-        console.log("--> demande carte, envoi tag id = " + tagId.toUpperCase())
-        retour = null
-      } else {
-        client_globale.emit("tagIdChange", tagId)
-      }
-    }
-    console.log("tagId =", tagId, "  --  retour =", retour)
-  }
-
-  function showNfcMsg(msg) {
-    console.log("msg =", msg)
-  }
-
-  function recordNfcStatusOn() {
-    env.nfcStatusOn = true
-  }
-
-
-  function initNfcDevice() {
-    console.log('')
-    try {
-      const pathDevice = root + '/modules/devices/' + env.device + '.js'
-      if (appDeviceEmitter !== null) {
-        appDeviceEmitter.removeListener("nfcReaderTagId", manageTagId)
-        appDeviceEmitter.removeListener("nfcReader", showNfcMsg)
-        appDeviceEmitter.removeListener("nfcReaderOn", recordNfcStatusOn)
-        appDeviceEmitter.removeListener("nfcReaderReStart", initNfcDevice)
-      }
-      import(pathDevice).then(module => {
-        const { deviceEmitter } = module
-        appDeviceEmitter = deviceEmitter
-        // --- nfc écoutes ---
-        appDeviceEmitter.addListener("nfcReaderTagId", manageTagId)
-        appDeviceEmitter.addListener("nfcReader", showNfcMsg)
-        appDeviceEmitter.addListener("nfcReaderOn", recordNfcStatusOn)
-        appDeviceEmitter.addListener("nfcReaderReStart", initNfcDevice)
-      })
-    } catch (error) {
-      console.log('-> initNfcDevice,', error)
-    }
-  }
 
   // --- socket.io handler ---
   const socketHandler = (client) => {
     client_globale = client
+    console.log("Client connecté !")
+    resetDevicesStatus()
+    initNfcDevice()
 
+    /*
     client_globale.on('askUpdateConfigurationFile', (data) => {
       // TODO: valider data
       console.log('->  askUpdateConfigurationFile')
@@ -203,14 +217,12 @@ try {
       console.log('-> msg "requestedIp" !')
       client_globale.emit('returnIp', getIp())
     })
+    */
 
     client_globale.on("disconnect", () => {
       console.log("Client déconnecté !!")
     })
   }
-
-  // lance l'écoute du serveur nfc
-  initNfcDevice()
 
   const optionsServer = {
     socketHandler,
@@ -235,8 +247,8 @@ try {
     credentials: true
   })
   // routes
-  app.addRoute('/config_file', readConfigFile)
-  app.addRoute('/write_config_file', writeConfigFile)
+  // app.addRoute('/config_file', readConfigFile)
+  // app.addRoute('/write_config_file', writeConfigFile)
 
   app.listen((host, port) => {
     console.log(`Lancement du serveur à l'adresse : ${port === 443 ? 'https' : 'http'}://${host}:${port}/`)
@@ -247,7 +259,4 @@ try {
 
 } catch (error) {
   console.log('error', error)
-  // Sentry.captureException(error)
-} finally {
-  // transaction.finish()
 }

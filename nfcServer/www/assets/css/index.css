@@ -1,3 +1,8 @@
+@font-face {
+  font-family: logoFont;
+  src: url("fonts/BeStrongRegular.otf") format("opentype");
+}
+
 * {
   -webkit-tap-highlight-color: rgba(0, 0, 0, 0);
   /* make transparent link selection, adjust last value opacity 0 to 1.0 */
@@ -9,6 +14,7 @@ body {
   -webkit-text-size-adjust: none;
   /* prevent webkit from resizing text to fit */
   -webkit-user-select: none;
+  user-select: none;
   /* prevent copy paste, to allow, change 'none' to 'text' */
   background-color: #3b567f;
   font-family: system-ui, -apple-system, -apple-system-font, 'Segoe UI', 'Roboto', sans-serif;
@@ -22,34 +28,37 @@ body {
   width: 100%;
 }
 
-#conteneur {
-  width: 100%;
-  height: calc(100% - 164px);
+@font-face {
+  font-family: logoFont;
+  src: url("fonts/BeStrongRegular.otf") format("opentype");
 }
 
-#affichage-alertes {
-  width: 100%;
-  height: 100%;
-  overflow: hidden;
-  margin: 4px;
+.tibillet-font {
+  font-family: logoFont;
+  color: #FFFFFF;
 }
 
-#entree-des-donnees {
-  display: none;
+.tibillet-font-size1 {
+  font-size: 4rem;
+  line-height: 4rem;
+  margin: 10px 0 8px 0;
 }
 
-#app-log {
-  display: none;
-  position: absolute;
-  width: calc(99% - 8px);
-  height: 164px;
-  background-color: #FFFFFF;
-  color: #000000;
-  left: 4px;
-  bottom: 4px;
-  overflow-x: hidden;
-  overflow-y: auto;
+.tibillet-font-size2 {
+  font-size: 2rem;
+  line-height: 2rem;
 }
+
+.tibillet-font-size3 {
+  font-size: 1.5rem;
+  line-height: 1.5rem;
+}
+
+.tibillet-font-size4 {
+  font-size: 1rem;
+  line-height: 1rem;
+}
+
 
 .BF-col {
   display: flex;
@@ -67,32 +76,84 @@ body {
   align-items: center;
 }
 
-.BF-ligne-deb {
-  display: flex;
-  flex-direction: row;
-  justify-content: flex-start;
-  align-items: center;
+#app {
+  width: 100%;
+  height: 100vh;
+  margin: 0px;
+  padding: 0px;
+  --danger-color: #FF0000;
+  --success-color: #00FF00;
+  --normal-color: #000000;
+  --info-color: #0000FF;
+  --error-color: #ffa600;
+  --ifm-font-color-base: #FFFFFF;
+  --bt-height0: 60px;
+  --bt-width0: 180px;
+  --bt-margin02: 4px;
+  overflow: hidden;
 }
 
-.ligne {
+#app-header {
   width: 100%;
-  margin: 8px 0;
+  height: 20%;
+}
+
+#app-main {
+  width: 100%;
+  height: 60%;
+}
+
+#app-infos-container {
+  position: relative;
+  width: 100%;
+  height: 20%;
+}
+
+#app-infos-container-scroll {
+  width: 100%;
+  height: 100%;
+  background-color: #FFFFFF;
+  font-size: 1.5rem;
+  overflow-y: scroll !important;
+}
+
+#app-infos-devices {
+  width: 100%;
+}
+
+#app-infos-logs {
+  width: 100%;
+}
+
+.log-msg {
+  font-size: 1.2rem;
+}
+
+#logs-led {
+  position: absolute;
+  right: 6px;
+  top: 6px;
+  border-radius: 50%;
+  width: 10px;
+  height: 10px;
+  background-color: #3b567f;
+  border-color: transparent;
+  transition: background-color 2s;
+}
+
+.bar-bottom {
+  border-bottom: 1px solid #3b567f;
+  margin-bottom: 6px;
 }
 
 .info {
-  font-size: 18px;
-  color: #FFFFFF;
+  padding: 4px 4px 0 4px;
 }
 
-.entree {
-  width: 80%;
-  color: #000000;
-}
 
-.action {
-  width: 180px;
-  height: 60px;
-  margin: 0 4px;
+.bt {
+  height: var(--bt-height0);
+  /* padding: 0 10px; */
   cursor: pointer;
   border: none;
   border-radius: 4px;
@@ -105,34 +166,157 @@ body {
   align-items: center;
 }
 
-.c-green {
-  background-color: #339448;
-}
-
-.c-blue {
-  background-color: #0f53b9;
-}
-
-.c-danger {
-  background-color: #ff0000;
-}
-
-.ligne-alerte {
-  margin: 30px 0 8px 0;
-}
-
-.message-icon {
+.action {
+  width: var(--bt-width0);
+  height: var(--bt-height0);
+  margin: 4px;
+  cursor: pointer;
+  border: none;
+  border-radius: 4px;
+  font-weight: bold;
+  font-size: 18px;
   color: #FFFFFF;
-  font-size: 16px;
+  display: flex;
+  flex-direction: row;
+  justify-content: center;
+  align-items: center;
+}
+
+.c-black {
+  color: #000000;
+}
+
+.c-white {
+  color: #FFFFFF;
+}
+
+.bgc-danger {
+  background-color: var(--danger-color);
+}
+
+.bgc-info {
+  background-color: var(--info-color);
+}
+
+.bgc-success {
+  background-color: var(--success-color);
+}
+
+.bgc-dev0 {
+  background-color: #88ca1d;
+}
+
+.bgc-dev1 {
+  background-color: #3b7f79;
+}
+
+.label {
+  font-size: 1.5rem;
+  color: #FFFFFF;
+  margin-bottom: 0.3rem;
 }
 
 .info-danger {
-  color: #ff0000;
+  color: var(--danger-color);
   font-size: 1rem;
+}
+
+.devices-off {
+  height: 100%;
+}
+
+.devices-off-item {
+  margin: 0 16px;
+}
+
+.h100 {
+  height: 100%;
 }
 
 .mt-2r {
   margin-top: 2rem;
+}
+
+.mr-1r {
+  margin-right: 1rem;
+}
+
+.mb-2r {
+  margin-bottom: 2rem;
+}
+
+#pin-code {
+  font-size: 2rem;
+  line-height: 2.4rem;
+  width: 140px;
+  text-align: center;
+}
+
+/* spinner */
+.spinner-container {
+  position: absolute;
+  left: 0;
+  top: 0;
+  width: 100%;
+  height: 100vh;
+  opacity: .6;
+  background-color: #1a1102;
+  z-index: 9999;
+  overflow: hidden;
+}
+
+.spinner {
+  --spinner-size: 100px;
+  width: var(--spinner-size);
+  height: var(--spinner-size);
+  border: 5px solid #FFF;
+  border-bottom-color: #0000FF;
+  border-radius: 50%;
+  display: inline-block;
+  box-sizing: border-box;
+  animation: rotation 1s linear infinite;
+}
+
+@keyframes rotation {
+  0% {
+    transform: rotate(0deg);
+  }
+
+  100% {
+    transform: rotate(360deg);
+  }
+}
+
+.servers-list-content {
+  width: 100%;
+  height: calc(100% - calc(var(--bt-height0) + calc(var(--bt-margin02) * 2)));
+  padding: 10px 0;
+  overflow-y: scroll;
+}
+
+.servers-list-footer {
+  width: 100%;
+  height: calc(var(--bt-height0) + calc(var(--bt-margin02) * 2));
+}
+
+.servers-list-item {
+  width: 100%;
+  font-size: 1.5rem;
+  margin: 8px 0;
+  background-color: #3b567f;
+  border-radius: 4px;
+}
+
+.bt-delete-server {
+  width: 20%;
+  margin-right: 4px;
+  background-color: var(--danger-color);
+}
+
+.bt-go-server {
+  width: 70%;
+  color: var(--normal-color);
+  background-color: var(--success-color);
 }
 
 #modal-confirm {
@@ -141,15 +325,6 @@ body {
   left: 0;
   width: 100vw;
   height: 100vh;
-  display: flex;
-  background-color: #160101;
-  opacity: 0.9;
-}
-
-.simple-keyboard {
-  display: none;
-}
-
-.show-keyboard {
-  display: block;
+  background-color: #1a1102;
+  opacity: 0.6;
 }

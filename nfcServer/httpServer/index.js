@@ -42,7 +42,7 @@ export class MTE {
     const handler = async (req, res) => {
       let url = req.url, useProxy = false
 
-      const origin = (req.headers.origin === undefined) ? 'http://localhost:3000' : req.headers.origin
+      const origin = (req.headers.origin === undefined) ? 'http://127.0.0.1:3000' : req.headers.origin
       // console.log('url =', req.url, '  --  origin =', origin)
 
       let headers = {}
@@ -56,7 +56,7 @@ export class MTE {
 
       //midleware
       this.listFonctions.forEach((foncData) => {
-        console.log('-> call midleware :')
+        // console.log('-> call midleware :')
         foncData.func.call(this, req, res, headers, foncData.options)
       })
 
@@ -89,7 +89,7 @@ export class MTE {
           let fichier, posDerPoint, extention
 
           // index_origine.html
-          if (url === '/') {
+          if (url === '/' || url === '/index.html') {
             url = '/index.html'
           }
 
@@ -155,5 +155,4 @@ export class MTE {
 
     return this.serveur
   }
-
 }
