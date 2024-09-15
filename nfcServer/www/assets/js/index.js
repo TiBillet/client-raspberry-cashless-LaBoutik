@@ -1,13 +1,19 @@
 /* eslint-disable no-undef */
 import {
-  listenDevicesStatus, launchRender, getConfigFromFile
+  listenDevicesStatus, launchRender, getConfigFromFile, getPinCode, checkPinCode, activeSpinner,
+  getUrlServerFromPinCode, goLaboutik, deleteServer
 } from './modules/machineActions.js'
 
 
 window.socket = io(location.origin)
-// infos pi
-window.device = null
-console.log('device =', device);
+// init infos pi
+window.piDevice = {
+  ip: '127.0.0.1',
+  model: 'unknown',
+  uuid: 'unknown',
+  manufacturer: 'Raspberry Pi',
+  hostname: 'unknown',
+}
 
 const state = {
   idApp: '#app',
@@ -53,7 +59,7 @@ const machine = {
   },
   GO_SERVER: {
     fromStep: 'LIST_SERVERS',
-    actions: 'goLaboutik'
+    actions: ['activeSpinner', 'goLaboutik']
   },
   CONFIRM_DELETE_SERVER: {
     fromStep: 'LIST_SERVERS',
@@ -64,9 +70,15 @@ const machine = {
     actions: 'deleteServer'
   },
   actions: {
-   listenDevicesStatus,
-   launchRender,
-   getConfigFromFile
+    listenDevicesStatus,
+    launchRender,
+    getConfigFromFile,
+    getPinCode,
+    checkPinCode,
+    activeSpinner,
+    getUrlServerFromPinCode,
+    goLaboutik,
+    deleteServer
   }
 }
 

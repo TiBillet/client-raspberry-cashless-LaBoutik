@@ -18,7 +18,7 @@ let devices = null
 const logLevel = env.logLevel
 
 // infos pi
-const devicePi = {
+const piDevice = {
     ip: getIp(),
     model: await getModelPi(),
     uuid: createUuidPiFromMacAddress(),
@@ -33,7 +33,7 @@ function resetDevicesStatus() {
     { name: 'nfc', status: 'off' },
   ]
   // status devices
-  if (devicePi.ip !== '127.0.0.1') {
+  if (piDevice.ip !== '127.0.0.1') {
     let network = devices.find(device => device.name === 'network')
     network.status = 'on'
   }
@@ -47,7 +47,7 @@ function recordNfcStatusOn() {
   if (nfcDevice.status === 'off') {
     console.log('-> emit "returnDevicesStatus"');
     nfcDevice.status = 'on'
-    client_globale.emit('returnDevicesStatus', { devicesStatus: devices, devicePi })
+    client_globale.emit('returnDevicesStatus', { devicesStatus: devices, piDevice })
   }
 }
 
@@ -95,7 +95,7 @@ function initNfcDevice() {
   }
 }
 
-/*
+
 function readConfigFile(req, res, headers) {
   // console.log('-> readConfigFile, headers =', headers)
   let retour
@@ -103,26 +103,15 @@ function readConfigFile(req, res, headers) {
   const configFromFile = readJson(root + '/' + saveFileName)
   if (configFromFile !== null) {
     retour = JSON.parse(configFromFile)
-    // console.log('-----------------------------------------------------');
-    // console.log('retour.server_pin_code =', retour.server_pin_code);
-    // console.log('env.server_pin_code =', env.server_pin_code);
-    // console.log('-----------------------------------------------------');
-    if (retour.server_pin_code !== env.server_pin_code) {
-      retour = env  
-      deleteFile(root + '/' + saveFileName)
-    }
   } else {
     retour = env
   }
-  retour['piDevice'] = {
-    ip: getIp(),
-    uuid: createUuidPiFromMacAddress(),
-    hostname: os.hostname()
-  }
+  retour['version'] = env.version
   res.writeHead(200, headers)
   res.write(JSON.stringify(retour))
   res.end()
 }
+
 
 function writeConfigFile(req, res, rawBody, headers) {
   // console.log('-> writeConfigFile, rawBody =', rawBody)
@@ -146,41 +135,6 @@ function writeConfigFile(req, res, rawBody, headers) {
   }
 }
 
-function readConfigurationApp() {
-  client_globale.emit("returnConfigurationApp", getConfigurationApp())
-}
-
-
-// Find specific server in configuration
-// @param {string} urlServer - server to find 
- //@param {object} configuration - app configuration 
- // @returns {undefined|object}
- //
-function findDataServerFromConfiguration(urlServer, configuration) {
-  if (urlServer === undefined) {
-    return undefined
-  }
-function generatePassword(length) {
-  const chars = "0123456789abcdefghijklmnopqrstuvwxyz!@#$%^&*()ABCDEFGHIJKLMNOPQRSTUVWXYZ"
-  let password = ""
-  const array = new Uint32Array(length)
-  crypto.getRandomValues(a
-  return configuration.servers.find(item => item.server === urlServer)
-}
-
-
-function generatePassword(length) {
-  const chars = "0123456789abcdefghijklmnopqrstuvwxyz!@#$%^&*()ABCDEFGHIJKLMNOPQRSTUVWXYZ"
-  let password = ""
-  const array = new Uint32Array(length)
-  crypto.getRandomValues(array)
-  for (let i = 0; i < length; i++) {
-    password += chars[array[i] % chars.length] // % operator returns remainder of division
-  }
-  return password
-}
-*/
-
 // encapsulate all errors
 try {
 
@@ -190,6 +144,11 @@ try {
     console.log("Client connecté !")
     resetDevicesStatus()
     initNfcDevice()
+
+    client_globale.on("demandeTagId", (data) => {
+      retour = data
+      console.log("-> demandeTagIdg = " + JSON.stringify(retour))
+    })
 
     /*
     client_globale.on('askUpdateConfigurationFile', (data) => {
@@ -202,11 +161,6 @@ try {
     client_globale.on("resetNfc", () => {
       console.log("-> resetNfc")
       initNfcDevice()
-    })
-
-    client_globale.on("demandeTagId", (data) => {
-      retour = data
-      console.log("-> demandeTagIdg = " + JSON.stringify(retour))
     })
 
     client_globale.on("AnnuleDemandeTagId", () => {
@@ -247,8 +201,8 @@ try {
     credentials: true
   })
   // routes
-  // app.addRoute('/config_file', readConfigFile)
-  // app.addRoute('/write_config_file', writeConfigFile)
+  app.addRoute('/config_file', readConfigFile)
+  app.addRoute('/write_config_file', writeConfigFile)
 
   app.listen((host, port) => {
     console.log(`Lancement du serveur à l'adresse : ${port === 443 ? 'https' : 'http'}://${host}:${port}/`)
