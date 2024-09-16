@@ -1,7 +1,7 @@
 /* eslint-disable no-undef */
 import { render } from './templateRender.js'
 
-// ---- méthodes "outils" ----
+// ---- méthodes dépendances ----
 window.log = function (typeMsg, msg, state) {
   console.log('-> log, typeMsg =', typeMsg, '  --  msg =', msg)
   state.logs.push({ typeMsg, msg })
@@ -99,14 +99,6 @@ async function updateConfigurationFile(options, state) {
   return await writeToFile(state)
 }
 
-
-function listenNfcAndShow() {
-  nfc.addTagDiscoveredListener((nfcEvent) => {
-    let tagId = nfc.bytesToHexString(nfcEvent.tag.id)
-    document.querySelector('#rep-tag-id').innerHTML = tagId.toUpperCase()
-  })
-}
-
 // ---- métodes de la machine ----
 
 // attention listenDevices must start before all tests devices
@@ -114,7 +106,6 @@ export function listenDevicesStatus(state) {
   // console.log('-> listenDevicesStatus');
   // update state with devices status && get infos host(pi)
   socket.on('returnDevicesStatus', (options) => {
-    console.log('options =', options);
    piDevice = options.piDevice
     state.ip = piDevice.ip
     let allDevicesOn = true
@@ -160,6 +151,12 @@ export async function getConfigFromFile(state) {
     log('error', 'readFromFile, ' + error, state)
     disableSpinner(state)
   }  
+}
+
+export function listenNfcAndShow() {
+  socket.on('tagIdChange', (tagId) => {
+    document.querySelector('#rep-tag-id').innerHTML = tagId
+  })
 }
 
 export function getPinCode(state) {

@@ -1,7 +1,7 @@
 /* eslint-disable no-undef */
 import {
   listenDevicesStatus, launchRender, getConfigFromFile, getPinCode, checkPinCode, activeSpinner,
-  getUrlServerFromPinCode, goLaboutik, deleteServer
+  listenNfcAndShow, getUrlServerFromPinCode, goLaboutik, deleteServer
 } from './modules/machineActions.js'
 
 
@@ -43,7 +43,7 @@ const machine = {
   },
   LIST_SERVERS: {
     fromStep: ['ALL_DEVICES_ON', 'GET_SERVER_FROM_PIN_CODE', 'GET_PIN_CODE', 'CONFIRM_DELETE_SERVER', 'DELETE_SERVER'],
-    actions: 'launchRender'
+    actions: ['launchRender', 'listenNfcAndShow']
   },
   GET_PIN_CODE: {
     fromStep: ['LIST_SERVERS', 'CHECK_PIN_CODE', 'GET_SERVER_FROM_PIN_CODE'],
@@ -73,6 +73,7 @@ const machine = {
     listenDevicesStatus,
     launchRender,
     getConfigFromFile,
+    listenNfcAndShow,
     getPinCode,
     checkPinCode,
     activeSpinner,

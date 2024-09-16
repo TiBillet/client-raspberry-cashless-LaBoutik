@@ -150,28 +150,9 @@ try {
       console.log("-> demandeTagIdg = " + JSON.stringify(retour))
     })
 
-    /*
-    client_globale.on('askUpdateConfigurationFile', (data) => {
-      // TODO: valider data
-      console.log('->  askUpdateConfigurationFile')
-      writeConfigurationApp(data)
-    })
-
-
-    client_globale.on("resetNfc", () => {
-      console.log("-> resetNfc")
-      initNfcDevice()
-    })
-
     client_globale.on("AnnuleDemandeTagId", () => {
       retour = null
     })
-
-    client_globale.on('requestedIp', () => {
-      console.log('-> msg "requestedIp" !')
-      client_globale.emit('returnIp', getIp())
-    })
-    */
 
     client_globale.on("disconnect", () => {
       console.log("Client déconnecté !!")

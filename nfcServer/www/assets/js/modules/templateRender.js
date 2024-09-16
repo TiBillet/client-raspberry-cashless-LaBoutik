@@ -55,13 +55,20 @@ function showDevicesOff(state) {
   }
 }
 
+// dev
+function mockServersList(nb) {
+  let servers = []
+  for (let i = 0; i < nb; i++) {
+    servers.push( {server: `https://server${i}.test.tibillet.re/` })
+  }
+  return servers
+}
+
 function showListServer(state) {
   if (state.currentStep === "LIST_SERVERS") {
     let content = `<div class="BF-col h100">
-      <div class="BF-col servers-list-content">`
-    // dev
-    // state.configuration.servers = devMockData()
-
+      <div class="servers-list-content hide-scroll-bar">`
+    // dev --- state.configuration.servers = mockServersList(10)
     state.configuration.servers.forEach(item => {
       const url = new URL(item.server)
       content += `<div class="BF-ligne servers-list-item">
@@ -120,9 +127,9 @@ function getPinCode(state) {
 }
 
 function showInfos(state) {
-  return `<div class="log-msg" style="color:var(--info-color);"> current step = ${state.currentStep}</div>
-  <div class="log-msg" style="color:var(--info-color);">version = ${state.configuration.version}</div>
+  return `<!-- <div class="log-msg" style="color:var(--info-color);"> current step = ${state.currentStep}</div> -->
   <div class="log-msg" style="color:var(--info-color);">tagId = <span id="rep-tag-id"></span></div>
+  <div class="log-msg" style="color:var(--info-color);">version = ${state.configuration.version}</div>
   <div class="log-msg" style="color:var(--info-color);">ip = ${state.ip}</div>
   <div class="log-msg" style="color:var(--info-color);"> manufacturer = ${piDevice.manufacturer}</div>
   <div class="log-msg" style="color:var(--info-color);">model = ${piDevice.model}</div>
@@ -164,7 +171,7 @@ function confirmDeleteServer(state) {
 }
 
 export const render = function (state) {
-  console.log('-> render =', state.currentStep);
+  // console.log('-> render =', state.currentStep);
   const template = `<section id="app-header" class="BF-col">
     <!-- show spinner -->
     ${showSpinner(state)}
