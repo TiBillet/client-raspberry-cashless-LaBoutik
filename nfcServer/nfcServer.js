@@ -7,7 +7,10 @@ import { cors } from './modules/cors.js'
 const root = process.cwd()
 const saveFileName = 'configLaboutik.json'
 let retour = null, client_globale = null, appDeviceEmitter = null
-let devices = null
+let devices  =  [
+  { name: 'network', status: 'off' },
+  { name: 'nfc', status: 'off' },
+]
 
 // 1 - affiche messages des appels socket.io et leurs méthodes uniquement
 // 2 - url et méthodes affiliées
@@ -23,6 +26,18 @@ const piDevice = {
     hostname: os.hostname(),
 }
 
+function initNetwork() {
+  piDevice.ip = getIp()
+  if (piDevice.ip !== '127.0.0.1') {
+    let network = devices.find(device => device.name === 'network')
+    network.status = 'on'
+  }
+  console.log('-> initNetwork, devices =', devices);
+  if (client_globale !== null) {
+    client_globale.emit('returnDevicesStatus', { devicesStatus: devices, piDevice })
+  }
+}
+
 // reset initial devices status
 function resetDevicesStatus() {
   devices = [
@@ -30,10 +45,7 @@ function resetDevicesStatus() {
     { name: 'nfc', status: 'off' },
   ]
   // status devices
-  if (piDevice.ip !== '127.0.0.1') {
-    let network = devices.find(device => device.name === 'network')
-    network.status = 'on'
-  }
+  initNetwork()
   // dev test network off
   // devices.find(device => device.name === 'network').status = 'off'
 }
@@ -44,6 +56,16 @@ function recordNfcStatusOn() {
   if (nfcDevice.status === 'off') {
     console.log('-> emit "returnDevicesStatus"');
     nfcDevice.status = 'on'
+    client_globale.emit('returnDevicesStatus', { devicesStatus: devices, piDevice })
+  }
+}
+
+function recordNfcStatusOff() {
+  let nfcDevice = devices.find(device => device.name === 'nfc')
+  // attention le lecteur nfc a un redémarrage cyclique, on teste uniquement le bon fonctionnement du nfc
+  if (nfcDevice.status === 'on') {
+    console.log('-> emit "returnDevicesStatus"');
+    nfcDevice.status = 'off'
     client_globale.emit('returnDevicesStatus', { devicesStatus: devices, piDevice })
   }
 }
@@ -76,6 +98,7 @@ function initNfcDevice() {
       appDeviceEmitter.removeListener("nfcReaderTagId", manageTagId)
       appDeviceEmitter.removeListener("nfcReader", showNfcMsg)
       appDeviceEmitter.removeListener("nfcReaderOn", recordNfcStatusOn)
+      appDeviceEmitter.removeListener("nfcReaderOff", recordNfcStatusOff)
       appDeviceEmitter.removeListener("nfcReaderReStart", initNfcDevice)
     }
     import(pathDevice).then(module => {
@@ -85,6 +108,7 @@ function initNfcDevice() {
       appDeviceEmitter.addListener("nfcReaderTagId", manageTagId)
       appDeviceEmitter.addListener("nfcReader", showNfcMsg)
       appDeviceEmitter.addListener("nfcReaderOn", recordNfcStatusOn)
+      appDeviceEmitter.addListener("nfcReaderOff", recordNfcStatusOff)
       appDeviceEmitter.addListener("nfcReaderReStart", initNfcDevice)
     })
   } catch (error) {
@@ -139,8 +163,6 @@ try {
   const socketHandler = (client) => {
     client_globale = client
     console.log("Client connecté !")
-    resetDevicesStatus()
-    initNfcDevice()
 
     client_globale.on("demandeTagId", (data) => {
       retour = data
@@ -149,6 +171,11 @@ try {
 
     client_globale.on("AnnuleDemandeTagId", () => {
       retour = null
+    })
+
+    client_globale.on("frontStart", () => {
+      initNetwork()
+      initNfcDevice()
     })
 
     client_globale.on("disconnect", () => {

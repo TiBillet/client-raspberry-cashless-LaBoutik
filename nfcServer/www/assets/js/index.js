@@ -1,6 +1,6 @@
 /* eslint-disable no-undef */
 import {
-  listenDevicesStatus, launchRender, getConfigFromFile, getPinCode, checkPinCode, activeSpinner,
+  listenDevicesStatus, launchRender, frontstart, getConfigFromFile, getPinCode, checkPinCode, activeSpinner,
   listenNfcAndShow, getUrlServerFromPinCode, goLaboutik, deleteServer
 } from './modules/machineActions.js'
 
@@ -35,7 +35,7 @@ const state = {
 const machine = {
   INIT: {
     fromStep: 'IDLE',
-    actions: ['listenDevicesStatus', 'launchRender']
+    actions: ['listenDevicesStatus', 'launchRender', 'frontstart']
   },
   ALL_DEVICES_ON: {
     fromStep: 'INIT',
@@ -72,6 +72,7 @@ const machine = {
   actions: {
     listenDevicesStatus,
     launchRender,
+    frontstart,
     getConfigFromFile,
     listenNfcAndShow,
     getPinCode,

@@ -30,6 +30,9 @@ setInterval(function () {
     // console.log('mfrc522 - setInterval :')
     // memoryStat()
 
+    // dev test
+    //throw new Error('lecteur nfc off');
+
     //# reset card
     mfrc522.reset()
     deviceEmitter.emit('nfcReaderOn')
@@ -72,6 +75,6 @@ setInterval(function () {
     mfrc522.setResetPin(22)
   } catch (error) {
     console.log('-> mfrc522, setInterval,', error)
+    deviceEmitter.emit('nfcReader', 'nfcReaderOff')
   }
 }, 500)
-

@@ -130,6 +130,10 @@ export function launchRender(state) {
   render(state)
 }
 
+export function frontstart(state) {
+  socket.emit('frontStart')
+}
+
 export function activeSpinner(state) {
   state.spinner = true
   render(state)
