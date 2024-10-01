@@ -54,6 +54,7 @@ export function logs(msg) {
   }
 }
 
+// read file
 export function readJson(path) {
   try {
     const fileExists = fs.existsSync(path)
