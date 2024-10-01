@@ -13,6 +13,8 @@ Boot your Pi
 Connect it via ssh
 
 ```
+#updates the package list
+sudo apt-get update
 #install git on your Pi
 sudo apt-get install git -y
 #git clone this repro
