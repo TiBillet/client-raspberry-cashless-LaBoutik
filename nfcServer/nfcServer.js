@@ -1,14 +1,11 @@
 import { MTE } from './httpServer/index.js'
-import { readJson, writeJson, getModelPi, getIp, createUuidPiFromMacAddress, startBrowser, deleteFile } from './modules/commun.js'
+import { readJson, writeJson, getModelPi, createUuidPiFromMacAddress, startBrowser, deleteFile, getIp } from './modules/commun.js'
 import { env } from './.env.js'
-import * as crypto from 'node:crypto'
-import * as SLUGIFY from 'slugify'
 import * as os from 'node:os'
 import { cors } from './modules/cors.js'
 
 const root = process.cwd()
 const saveFileName = 'configLaboutik.json'
-const slugify = SLUGIFY.default
 let retour = null, client_globale = null, appDeviceEmitter = null
 let devices = null
 

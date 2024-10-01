@@ -172,7 +172,7 @@ JSON_STRING='{
 "type":"module",
 "license": "ISC",
 "dependencies":{
-  "local-ip-url":"^1.0.10",
+  "address":"^2.0.3",
   "socket.io": "^4.7.2",
   "@sentry/node": "^7.106.0",
   "@sentry/profiling-node": "^7.106.0",

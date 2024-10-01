@@ -1,10 +1,9 @@
 import * as fs from "node:fs"
-import * as LOCALIP from "local-ip-url"
+import { ip, ipv6, mac } from 'address'
 import { spawn } from "child_process"
 import * as process from "node:process"
 import * as os from 'node:os'
 
-const localIpUrl = LOCALIP.default
 const root = process.cwd()
 const config = readJson(root + "/.env.json")
 const pathLogs = root + "/logs.txt"
@@ -59,10 +58,7 @@ export function readJson(path) {
   try {
     const fileExists = fs.existsSync(path)
     if (fileExists) {
-      const rawdata = fs.readFileSync(path, { encoding: 'utf8' })
-      return JSON.parse(rawdata)
-    } else {
-      throw new Error("The file doesn't exist")
+      const rawdata = fs.readFileSync(path, { encodingimport { ip, ipv6, mac } from 'address'
     }
   } catch (error) {
     console.log("Lecture fichier de configuration,", error.message)
@@ -91,9 +87,9 @@ export function getInfosServerNfc(url) {
 
 export function getIp() {
   try {
-    const ip = localIpUrl()
-    if (ip !== "127.0.0.1" && ip !== "0.0.0.0") {
-      return ip
+    const currentIp = ip()
+    if (currentIp !== "127.0.0.1" && currentIp !== "0.0.0.0") {
+      return currentIp
     } else {
       return "127.0.0.1"
     }
