@@ -7,7 +7,10 @@ import { cors } from './modules/cors.js'
 const root = process.cwd()
 const saveFileName = 'configLaboutik.json'
 let retour = null, client_globale = null, appDeviceEmitter = null
-let devices = null
+let devices =  [
+  { name: 'network', status: 'off' },
+  { name: 'nfc', status: 'off' },
+]
 
 // 1 - affiche messages des appels socket.io et leurs méthodes uniquement
 // 2 - url et méthodes affiliées
@@ -15,12 +18,24 @@ let devices = null
 const logLevel = env.logLevel
 
 // infos pi
-const piDevice = {
+let piDevice = {
     ip: getIp(),
     model: await getModelPi(),
     uuid: createUuidPiFromMacAddress(),
     manufacturer: 'Raspberry Pi',
     hostname: os.hostname(),
+}
+
+function initNetwork() {
+  piDevice.ip = getIp()
+  if (piDevice.ip !== '127.0.0.1') {
+    let network = devices.find(device => device.name === 'network')
+    network.status = 'on'
+  }
+  console.log('-> initNetwork, devices =', devices);
+  if (client_globale !== null) {
+    client_globale.emit('returnDevicesStatus', { devicesStatus: devices, piDevice })
+  }
 }
 
 // reset initial devices status
@@ -30,10 +45,7 @@ function resetDevicesStatus() {
     { name: 'nfc', status: 'off' },
   ]
   // status devices
-  if (piDevice.ip !== '127.0.0.1') {
-    let network = devices.find(device => device.name === 'network')
-    network.status = 'on'
-  }
+  initNetwork()
   // dev test network off
   // devices.find(device => device.name === 'network').status = 'off'
 }
@@ -69,7 +81,7 @@ function showNfcMsg(msg) {
 }
 
 function initNfcDevice() {
-  console.log('')
+  console.log('-> initNfcDevice')
   try {
     const pathDevice = root + '/modules/devices/' + env.device + '.js'
     if (appDeviceEmitter !== null) {
@@ -134,12 +146,13 @@ function writeConfigFile(req, res, rawBody, headers) {
 
 // encapsulate all errors
 try {
+  resetDevicesStatus()
 
   // --- socket.io handler ---
   const socketHandler = (client) => {
     client_globale = client
     console.log("Client connecté !")
-    resetDevicesStatus()
+    initNetwork()
     initNfcDevice()
 
     client_globale.on("demandeTagId", (data) => {
@@ -153,6 +166,11 @@ try {
 
     client_globale.on("disconnect", () => {
       console.log("Client déconnecté !!")
+    })
+
+    client_globale.on("frontStart", () => {
+      initNetwork()
+      initNfcDevice()
     })
   }
 
