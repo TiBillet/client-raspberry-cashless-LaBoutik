@@ -58,7 +58,10 @@ export function readJson(path) {
   try {
     const fileExists = fs.existsSync(path)
     if (fileExists) {
-      const rawdata = fs.readFileSync(path, , { encoding: 'utf8' })
+      const rawdata = fs.readFileSync(path, { encoding: 'utf8' })
+      return JSON.parse(rawdata)
+    }  else {
+      throw new Error("The file doesn't exist")
     }
   } catch (error) {
     console.log("Lecture fichier de configuration,", error.message)
