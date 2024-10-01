@@ -28,9 +28,11 @@ const piDevice = {
 
 function initNetwork() {
   piDevice.ip = getIp()
-  if (piDevice.ip !== '127.0.0.1') {
-    let network = devices.find(device => device.name === 'network')
+  let network = devices.find(device => device.name === 'network')
+  if (piDevice.ip !== '127.0.0.1' && piDevice.ip !== '0.0.0.0' && piDevice.ip !== undefined && piDevice.ip !== null) {
     network.status = 'on'
+  } else {
+    network.status = 'off'
   }
   console.log('-> initNetwork, devices =', devices);
   if (client_globale !== null) {
