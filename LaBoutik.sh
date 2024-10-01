@@ -175,9 +175,7 @@ JSON_STRING='{
   "address":"^2.0.3",
   "socket.io": "^4.7.2",
   "@sentry/node": "^7.106.0",
-  "@sentry/profiling-node": "^7.106.0",
-  "slugify": "^1.6.6",
-  "http-proxy": "^1.18.1",'
+  "@sentry/profiling-node": "^7.106.0",'
 
 if [ $nfc = 'gpio' ]
   then
