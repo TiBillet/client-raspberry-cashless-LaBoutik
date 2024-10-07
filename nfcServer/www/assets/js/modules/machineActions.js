@@ -269,24 +269,26 @@ export async function deleteServer(state) {
 // Update current server and go LaBoutik
 // @param {object} state - application state 
 export async function goLaboutik(state) {
-  const server = state.params
-  console.log('-> goLaboutik, server =', server)
-  const client = state.configuration.servers.find(item => item.server === server).client
-  console.log('-> client =', client)
-  // change current server
-  state.configuration.current_server = server
-  // change client of the new current server
-  state.configuration.client = client
-  // change le pin code of the new current server
-  state.configuration.pin_code = client.pin_code
-  // update configuration file
-  const result = await writeToFile(state)
-  console.log('result =', result)
+  if (window.navigator.onLine) {
+    const server = state.params
+    activeSpinner(state)
+    const client = state.configuration.servers.find(item => item.server === server).client
+    // change current server
+    state.configuration.current_server = server
+    // change client of the new current server
+    state.configuration.client = client
+    // change le pin code of the new current server
+    state.configuration.pin_code = client.pin_code
+    // update configuration file
+    const result = await writeToFile(state)
 
-  if (result === true) {
-    window.location = server + state.urlLogin
+    if (result === true) {
+      window.location = server + state.urlLogin
+    } else {
+      log('error', '-> Change current server error.', state)
+      disableSpinner(state)
+    }
   } else {
-    log('error', '-> Change current server error.', state)
-    disableSpinner(state)
+    ma.run('NO_NETWORK')
   }
 }

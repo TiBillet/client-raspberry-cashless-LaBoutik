@@ -42,7 +42,7 @@ const machine = {
     actions: 'getConfigFromFile',
   },
   LIST_SERVERS: {
-    fromStep: ['ALL_DEVICES_ON', 'GET_SERVER_FROM_PIN_CODE', 'GET_PIN_CODE', 'CONFIRM_DELETE_SERVER', 'DELETE_SERVER'],
+    fromStep: ['ALL_DEVICES_ON', 'GET_SERVER_FROM_PIN_CODE', 'GET_PIN_CODE', 'CONFIRM_DELETE_SERVER', 'DELETE_SERVER', 'NO_NETWORK'],
     actions: ['launchRender', 'listenNfcAndShow']
   },
   GET_PIN_CODE: {
@@ -60,6 +60,10 @@ const machine = {
   GO_SERVER: {
     fromStep: 'LIST_SERVERS',
     actions: ['activeSpinner', 'goLaboutik']
+  },
+  NO_NETWORK: {
+    fromStep: 'GO_SERVER',
+    actions: 'launchRender'
   },
   CONFIRM_DELETE_SERVER: {
     fromStep: 'LIST_SERVERS',
